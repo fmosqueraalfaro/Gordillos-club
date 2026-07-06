@@ -97,3 +97,22 @@ descartamos. Formato liviano tipo ADR (Architecture Decision Record). Orden cron
 - **Alternativas descartadas:** solo lugares con una puntuación por persona (más simple,
   pero pierde el diario y las visitas repetidas); experiencias individuales por persona
   (se prefirió compartida, acorde al "club de dos").
+
+## ADR-010 — Doble nota compartida: uno carga las dos (grupos, diferido)
+- **Fecha:** 2026-07-06
+- **Estado:** Aceptada
+- **Decisión:** como salen a comer **juntos y en persona**, el que carga una experiencia pone
+  **las dos estrellas** (la suya y la del otro) en el mismo formulario; y desde el detalle
+  cualquiera puede **editar** las notas después. Para habilitarlo, la RLS de
+  `experience_ratings` pasa de "cada uno solo su fila" a **los dos pueden escribir cualquier
+  nota** (modelo de confianza de pareja) → migración `0003_ratings_shared.sql`. La unicidad
+  `(experience_id, user_id)` sigue garantizando UNA nota por persona.
+- **Por qué:** es como se usa de verdad (uno anota mientras charlan). Pedir que cada uno entre
+  con su cuenta a poner su nota era fricción innecesaria para dos personas de confianza.
+- **Grupos (diferido):** se evaluó generalizar a **"grupos de comida"** (círculos de usuarios
+  que comen juntos, y al puntuar se cargan las notas de todos los miembros). Se **difiere a la
+  fase de escalado**: para dos personas el "grupo" son ellos dos, implícito. La base ya guarda
+  **N notas por experiencia** (una fila por persona), así que grupos es una capa de membresía
+  que se suma **encima sin reescribir**. Ver `docs/pendientes.md` (sección futuro).
+- **Alternativas descartadas:** cada uno carga su nota desde su cuenta (más seguro pero con
+  fricción); sistema de grupos ahora (sobredimensionado para dos usuarios).

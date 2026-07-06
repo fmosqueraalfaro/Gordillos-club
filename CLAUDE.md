@@ -107,11 +107,15 @@ su nota → la doble puntuación vive en cada experiencia. Ver `docs/modelo-dato
   el detalle del pin, sin duplicar); 📸 **fotos por experiencia** (uploader → Storage → se
   ven en Diario/detalle); 🔎 **búsqueda con Places** (autocomplete + session tokens, prellena
   el alta). Deploy en Vercel funcionando en el celular. **Entrega 2 completa.**
-- **Pendiente de config (usuario):** habilitar **"Places API (New)"** en Google Cloud para que
-  ande el buscador (ver `docs/setup-google-maps.md`).
+- **Doble puntuación:** el alta pide **una estrella por cada uno** (el que carga pone las dos,
+  van a comer juntos); el detalle del lugar muestra **la nota de cada uno** (no promedio) y
+  permite **editar** las notas. RLS compartida → migración `0003_ratings_shared.sql`.
+  "Grupos de comida" quedó diferido a la fase de escalado (ADR-010).
+- **Pendiente de config (usuario):** (1) correr `0003_ratings_shared.sql` en Supabase;
+  (2) "Places API (New)" ya habilitada ✅.
 - **Próximo paso:** Fase 3 — recomendaciones (motor propio + descubrimiento Places), y pulido
-  (filtros, editar/borrar, tags, medias estrellas, PWA). Ver `docs/pendientes.md`.
-- Ver último detalle en `worklog/2026-07/2026-07-06-fotos-y-places.md`.
+  (filtros, editar/borrar resto, tags, medias estrellas, PWA). Ver `docs/pendientes.md`.
+- Ver último detalle en `worklog/2026-07/2026-07-06-doble-puntuacion.md`.
 
 ---
 

@@ -1,15 +1,25 @@
 import { supabase } from "@/lib/supabase"
-import type { NewExperienceInput } from "@/features/experiences/types"
+import type { NewExperienceInput, RatingInput } from "@/features/experiences/types"
 
 /** Los datos de UNA visita (sin el lugar): sirven para lugar nuevo o existente. */
 export type VisitInput = {
   visitedOn: string // YYYY-MM-DD
   dish: string
   note: string
-  rating: number // 1–5
+  ratings: RatingInput[] // la nota de cada persona
 }
 
-/** Inserta la experiencia (visita) + tu puntuación sobre un lugar ya conocido. */
+/** Inserta las notas (una por persona, si es > 0) de una experiencia. */
+async function insertRatings(experienceId: string, ratings: RatingInput[]) {
+  const rows = ratings
+    .filter((r) => r.rating > 0)
+    .map((r) => ({ experience_id: experienceId, user_id: r.userId, rating: r.rating }))
+  if (rows.length === 0) return
+  const { error } = await supabase.from("experience_ratings").insert(rows)
+  if (error) throw error
+}
+
+/** Inserta la experiencia (visita) + las notas sobre un lugar ya conocido. */
 async function insertVisit(restaurantId: string, input: VisitInput, userId: string) {
   const { data: experience, error: eErr } = await supabase
     .from("experiences")
@@ -24,16 +34,12 @@ async function insertVisit(restaurantId: string, input: VisitInput, userId: stri
     .single()
   if (eErr) throw eErr
 
-  const { error: ratErr } = await supabase
-    .from("experience_ratings")
-    .insert({ experience_id: experience.id, user_id: userId, rating: input.rating })
-  if (ratErr) throw ratErr
-
+  await insertRatings(experience.id, input.ratings)
   return experience.id as string
 }
 
 /**
- * Crea un lugar NUEVO + su primera experiencia + tu puntuación, en cadena.
+ * Crea un lugar NUEVO + su primera experiencia + las notas, en cadena.
  * (Para sumar otra visita a un lugar YA existente, usar `addVisitToRestaurant`.)
  */
 export async function createExperience(input: NewExperienceInput, userId: string) {
@@ -62,4 +68,35 @@ export async function addVisitToRestaurant(
 ) {
   const experienceId = await insertVisit(restaurantId, input, userId)
   return { restaurantId, experienceId }
+}
+
+/**
+ * Crea/actualiza las notas de una experiencia existente (editar después).
+ * Upsert por (experience_id, user_id): cada persona tiene UNA nota.
+ * Una nota en 0 se interpreta como "sacarla" (se borra la fila).
+ */
+export async function upsertRatings(experienceId: string, ratings: RatingInput[]) {
+  const toSet = ratings.filter((r) => r.rating > 0)
+  const toClear = ratings.filter((r) => r.rating <= 0).map((r) => r.userId)
+
+  if (toSet.length > 0) {
+    const rows = toSet.map((r) => ({
+      experience_id: experienceId,
+      user_id: r.userId,
+      rating: r.rating,
+    }))
+    const { error } = await supabase
+      .from("experience_ratings")
+      .upsert(rows, { onConflict: "experience_id,user_id" })
+    if (error) throw error
+  }
+
+  if (toClear.length > 0) {
+    const { error } = await supabase
+      .from("experience_ratings")
+      .delete()
+      .eq("experience_id", experienceId)
+      .in("user_id", toClear)
+    if (error) throw error
+  }
 }

@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import type { FormEvent } from "react"
 import { useAuth } from "@/features/auth/AuthProvider"
+import { useProfiles } from "@/features/profiles/useProfiles"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { StarRatingInput } from "@/components/ui/StarRatingInput"
 import { MapPinIcon, PlusIcon } from "@/components/ui/icons"
 import { createExperience, addVisitToRestaurant } from "@/features/experiences/createExperience"
 import { uploadExperiencePhotos } from "@/features/experiences/photos"
-import type { DraftLocation } from "@/features/experiences/types"
+import type { DraftLocation, RatingInput } from "@/features/experiences/types"
 
 const TEXTAREA_CLASS =
   "w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-muted/60 focus:border-aqua focus:ring-2 focus:ring-aqua/25"
@@ -27,12 +28,13 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
   const isExisting = props.mode === "existing"
   const prefill = props.mode === "existing" ? undefined : props.prefill
   const { user } = useAuth()
+  const { profiles } = useProfiles(user?.id)
   const [name, setName] = useState(prefill?.name ?? "")
   const [neighborhood, setNeighborhood] = useState(prefill?.neighborhood ?? "")
   const [visitedOn, setVisitedOn] = useState(() => new Date().toISOString().slice(0, 10))
   const [dish, setDish] = useState("")
   const [note, setNote] = useState("")
-  const [rating, setRating] = useState(0)
+  const [ratings, setRatings] = useState<Record<string, number>>({})
   const [files, setFiles] = useState<File[]>([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -44,7 +46,12 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
 
   const today = new Date().toISOString().slice(0, 10)
   const nameOk = isExisting || name.trim().length > 0
-  const canSave = nameOk && rating > 0 && !busy
+  const hasRating = Object.values(ratings).some((v) => v > 0)
+  const canSave = nameOk && hasRating && !busy
+
+  function setRatingFor(userId: string, value: number) {
+    setRatings((prev) => ({ ...prev, [userId]: value }))
+  }
 
   function addFiles(list: FileList | null) {
     if (!list) return
@@ -60,11 +67,15 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
     e.preventDefault()
     if (!user) return
     if (!isExisting && !name.trim()) return setError("Ponele un nombre al lugar.")
-    if (rating < 1) return setError("Elegí tu puntuación (1 a 5 estrellas).")
+    if (!hasRating) return setError("Elegí al menos una puntuación.")
     setBusy(true)
     setError(null)
     try {
-      const visit = { visitedOn, dish: dish.trim(), note: note.trim(), rating }
+      const ratingList: RatingInput[] = profiles.map((p) => ({
+        userId: p.id,
+        rating: ratings[p.id] ?? 0,
+      }))
+      const visit = { visitedOn, dish: dish.trim(), note: note.trim(), ratings: ratingList }
       const result =
         props.mode === "existing"
           ? await addVisitToRestaurant(props.restaurant.id, visit, user.id)
@@ -197,9 +208,23 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
             </div>
           </div>
 
-          <div className="flex flex-col gap-1.5 text-sm font-medium text-ink">
-            Tu puntuación
-            <StarRatingInput value={rating} onChange={setRating} />
+          {/* Doble puntuación: una estrella por cada uno */}
+          <div className="flex flex-col gap-3 rounded-xl bg-surface-2 p-3">
+            <p className="text-sm font-medium text-ink">
+              Puntuaciones <span className="font-normal text-muted">(la de cada uno)</span>
+            </p>
+            {profiles.map((person) => (
+              <div key={person.id} className="flex items-center justify-between gap-3">
+                <span className="text-sm text-ink">
+                  {person.displayName}
+                  {person.id === user?.id && <span className="text-muted"> (vos)</span>}
+                </span>
+                <StarRatingInput
+                  value={ratings[person.id] ?? 0}
+                  onChange={(v) => setRatingFor(person.id, v)}
+                />
+              </div>
+            ))}
           </div>
 
           {error && (

@@ -1,5 +1,11 @@
 export type DraftLocation = { lat: number; lng: number }
 
+/** La estrella de una persona (1–5) sobre una experiencia. */
+export type RatingInput = {
+  userId: string
+  rating: number
+}
+
 export type NewExperienceInput = {
   name: string
   neighborhood: string | null
@@ -8,5 +14,5 @@ export type NewExperienceInput = {
   visitedOn: string // YYYY-MM-DD
   dish: string
   note: string
-  rating: number // 1–5
+  ratings: RatingInput[] // la nota de cada persona
 }

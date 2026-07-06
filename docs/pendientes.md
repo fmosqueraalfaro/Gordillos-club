@@ -37,7 +37,10 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 
 ## ✏️ Gestión de experiencias
 
-- [ ] **Editar** y **borrar** una experiencia / un lugar.
+- [x] **Doble puntuación en el alta**: una estrella por cada uno; el que carga pone las dos
+      (van a comer juntos). Requiere la migración `0003_ratings_shared.sql`.
+- [x] **Editar puntuaciones** desde el detalle del lugar (cualquiera edita las notas).
+- [ ] **Editar/borrar** el resto de la experiencia (fecha, plato, nota, fotos) / un lugar.
 - [ ] **Tags** por restaurante (parrilla, pizza, café…) con UI de chips.
 - [ ] **Medias estrellas** en la carga (la base ya admite 4.5; hoy el input es de 1 a 5
       enteros).
@@ -47,6 +50,13 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 - [ ] **Filtros**: por barrio, tag, puntuación.
 - [ ] **Estadísticas / resumen**: cuántos lugares, barrio favorito, promedio, "mejor del
       mes", etc.
+
+## 👥 Grupos de comida (Fase escalado — ver ADR-010)
+
+- [ ] **Grupos de usuarios que comen juntos** ("nosotros dos", "los del laburo", "la familia").
+      Al puntuar se elige el grupo y se cargan las notas de cada miembro. Hoy el "grupo" son
+      los dos usuarios, implícito. La base ya soporta N notas por experiencia → es una capa de
+      membresía encima, sin reescribir. Recién tiene sentido con más de dos personas.
 
 ## 💡 Recomendaciones (Fase 3 — ver `recomendaciones.md`)
 
@@ -70,6 +80,9 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 ---
 
 ## ⚠️ Deuda técnica / cosas a tener en cuenta
+
+- **Correr en Supabase la migración `0003_ratings_shared.sql`** (SQL Editor → Run). Sin ella,
+  guardar la nota del otro falla por RLS (cada uno solo podría escribir la suya).
 
 - El "Agregar" del mapa siempre crea un lugar nuevo; para sumar a uno existente se entra por
   el pin → "Sumar visita acá". (No hay merge de duplicados si ya se crearon dos pins iguales.)
