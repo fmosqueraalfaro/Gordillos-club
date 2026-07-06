@@ -95,14 +95,16 @@ su nota → la doble puntuación vive en cada experiencia. Ver `docs/modelo-dato
 
 ## 5. Estado del proyecto
 
-- **Fase actual:** 🏗️ Fase 1 — Fundaciones (iniciada 2026-07-05).
-- **Hecho:** documentación base; scaffold (React 19 + Vite 8 + TS 6 + Tailwind v4);
-  Supabase conectado (esquema aplicado + verificado); **auth + layout base**; **identidad
-  visual** (paleta fría + verde agua, claro/oscuro, Fraunces + Hanken, firma doble puntuación);
-  **nombre Gordillos Club**. Build y dev verificados OK.
-- **Próximo paso:** crear las cuentas reales (👤) y arrancar el **mapa** (Google Maps) + alta
-  de restaurantes.
-- Ver último detalle en `worklog/2026-07/2026-07-06-rediseno-y-nombre.md`.
+- **Fase actual:** 🏗️ Fase 2 — Núcleo funcional (en curso).
+- **En vivo:** 🌐 https://gordillos-club-swart.vercel.app/ · Repo:
+  https://github.com/fmosqueraalfaro/Gordillos-club (`main`, auto-deploy en cada push).
+- **Hecho:** documentación; scaffold; Supabase (esquema 0001+0002 verificado); auth + layout;
+  identidad visual (fríos + verde agua, claro/oscuro, Fraunces+Hanken, firma doble puntuación);
+  nombre Gordillos Club; **mapa Google Maps**; **alta de experiencia** (tocar el mapa →
+  nombre/barrio/fecha/plato/nota/estrellas → pin). Deploy en Vercel funcionando en el celular.
+- **Próximo paso:** Entrega 2 — **Diario** + **fotos** + **GPS** + **Places search** + elegir
+  lugar existente. Ver `docs/pendientes.md`.
+- Ver último detalle en `worklog/2026-07/2026-07-06-github-y-deploy.md`.
 
 ---
 
