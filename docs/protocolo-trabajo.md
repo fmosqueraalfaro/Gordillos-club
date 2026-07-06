@@ -67,6 +67,8 @@ Una tarea está *hecha* cuando:
 - Trabajar en ramas por feature y mergear (o commits directos en `main` si preferís simple,
   al ser proyecto personal — a confirmar).
 - Mensajes de commit claros, en presente. Ej: `add restaurant map view`.
+- **Los commits NO llevan trailer `Co-Authored-By`** (preferencia del usuario, desde
+  2026-07-05). Mensajes limpios, sin firma de co-autoría de la IA.
 - `.gitignore` desde el arranque: `node_modules`, `.env`, build outputs.
 
 > Nota: el proyecto todavía NO es un repo git. Se inicializa en Fase 1.
