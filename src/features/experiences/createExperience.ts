@@ -70,6 +70,41 @@ export async function addVisitToRestaurant(
   return { restaurantId, experienceId }
 }
 
+/** Actualiza los datos de una experiencia (fecha, plato, nota). */
+export async function updateExperience(
+  experienceId: string,
+  fields: { visitedOn: string; dish: string; note: string },
+) {
+  const { error } = await supabase
+    .from("experiences")
+    .update({
+      visited_on: fields.visitedOn,
+      dish: fields.dish || null,
+      note: fields.note || null,
+    })
+    .eq("id", experienceId)
+  if (error) throw error
+}
+
+/**
+ * Borra una experiencia entera (cascada: sus notas y filas de fotos). Los
+ * archivos de Storage se borran best-effort después.
+ */
+export async function deleteExperience(experienceId: string) {
+  const { data: pics } = await supabase
+    .from("photos")
+    .select("storage_path")
+    .eq("experience_id", experienceId)
+
+  const { error } = await supabase.from("experiences").delete().eq("id", experienceId)
+  if (error) throw error
+
+  const paths = (pics ?? []).map((p) => p.storage_path as string)
+  if (paths.length > 0) {
+    await supabase.storage.from("photos").remove(paths)
+  }
+}
+
 /**
  * Crea/actualiza las notas de una experiencia existente (editar después).
  * Upsert por (experience_id, user_id): cada persona tiene UNA nota.

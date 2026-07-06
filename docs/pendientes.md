@@ -39,8 +39,11 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 
 - [x] **Doble puntuación en el alta**: una estrella por cada uno; el que carga pone las dos
       (van a comer juntos). Requiere la migración `0003_ratings_shared.sql`.
-- [x] **Editar puntuaciones** desde el detalle del lugar (cualquiera edita las notas).
-- [ ] **Editar/borrar** el resto de la experiencia (fecha, plato, nota, fotos) / un lugar.
+- [x] **Editar experiencia**: fecha, plato, nota, fotos (agregar/quitar) y las puntuaciones,
+      desde el Diario y el detalle (botón "Editar").
+- [x] **Borrar experiencia** (con confirmación) desde el Diario y el detalle. Los dos pueden
+      borrar (migración `0004_experiences_shared_delete.sql`).
+- [ ] **Borrar un lugar** (restaurante) entero.
 - [ ] **Tags** por restaurante (parrilla, pizza, café…) con UI de chips.
 - [x] **Medias estrellas** en la carga (input 1–5 con medias, ej. 4.5; mín. 1 por el CHECK).
 
@@ -83,6 +86,8 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 
 - **Correr en Supabase la migración `0003_ratings_shared.sql`** (SQL Editor → Run). Sin ella,
   guardar la nota del otro falla por RLS (cada uno solo podría escribir la suya).
+- **Correr en Supabase la migración `0004_experiences_shared_delete.sql`** (SQL Editor → Run).
+  Sin ella, borrar una experiencia que cargó el otro falla por RLS.
 - **Cerrar el registro en Supabase**: Auth → "Allow new users to sign up" → OFF (candado B).
   El frontend ya esconde el "Creá una cuenta", pero el bloqueo real es este toggle. Así nadie
   nuevo puede registrarse ni disparar la API. Confirmar también que solo esté el proveedor

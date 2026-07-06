@@ -7,6 +7,20 @@ export function photoPublicUrl(storagePath: string): string {
   return supabase.storage.from(BUCKET).getPublicUrl(storagePath).data.publicUrl
 }
 
+/** Borra fotos (fila en la tabla + archivo en Storage, best-effort). */
+export async function deletePhotos(photos: { id: string; storagePath: string }[]) {
+  if (photos.length === 0) return
+  const { error } = await supabase
+    .from("photos")
+    .delete()
+    .in(
+      "id",
+      photos.map((p) => p.id),
+    )
+  if (error) throw error
+  await supabase.storage.from("photos").remove(photos.map((p) => p.storagePath))
+}
+
 /**
  * Sube archivos al bucket `photos` y registra cada uno en la tabla `photos`,
  * ligados a la experiencia. Path: `<userId>/<experienceId>/<uuid>.<ext>`.

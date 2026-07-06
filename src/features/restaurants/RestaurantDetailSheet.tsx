@@ -1,14 +1,10 @@
 import { useMemo, useState } from "react"
 import { useAuth } from "@/features/auth/AuthProvider"
 import { useProfiles } from "@/features/profiles/useProfiles"
-import type { PersonProfile } from "@/features/profiles/useProfiles"
 import { useExperiences } from "@/features/experiences/useExperiences"
-import type { ExperienceEntry } from "@/features/experiences/useExperiences"
-import { ExperienceCard } from "@/features/experiences/ExperienceCard"
+import { ExperienceRow } from "@/features/experiences/ExperienceRow"
 import { AddExperienceSheet } from "@/features/experiences/AddExperienceSheet"
-import { upsertRatings } from "@/features/experiences/createExperience"
 import { RatingStrip } from "@/components/ratings/DualRating"
-import { StarRatingInput } from "@/components/ui/StarRatingInput"
 import { MapPinIcon, PlusIcon } from "@/components/ui/icons"
 import type { Restaurant } from "@/features/restaurants/types"
 
@@ -138,12 +134,13 @@ export function RestaurantDetailSheet({
                 Historial
               </p>
               {experiences.map((exp) => (
-                <ExperienceItem
+                <ExperienceRow
                   key={exp.id}
                   experience={exp}
                   profiles={profiles}
                   currentUserId={user?.id}
-                  onSaved={handleChanged}
+                  showPlace={false}
+                  onChanged={handleChanged}
                 />
               ))}
             </div>
@@ -163,119 +160,5 @@ export function RestaurantDetailSheet({
         />
       )}
     </>
-  )
-}
-
-/** Una experiencia del historial con opción de editar las puntuaciones. */
-function ExperienceItem({
-  experience,
-  profiles,
-  currentUserId,
-  onSaved,
-}: {
-  experience: ExperienceEntry
-  profiles: PersonProfile[]
-  currentUserId?: string
-  onSaved: () => void
-}) {
-  const [editing, setEditing] = useState(false)
-
-  return (
-    <div className="flex flex-col gap-2">
-      <ExperienceCard experience={experience} showPlace={false} />
-      {editing ? (
-        <RatingsEditor
-          experience={experience}
-          profiles={profiles}
-          currentUserId={currentUserId}
-          onCancel={() => setEditing(false)}
-          onSaved={() => {
-            setEditing(false)
-            onSaved()
-          }}
-        />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          className="self-start text-xs font-medium text-aqua hover:underline"
-        >
-          Editar puntuaciones
-        </button>
-      )}
-    </div>
-  )
-}
-
-function RatingsEditor({
-  experience,
-  profiles,
-  currentUserId,
-  onCancel,
-  onSaved,
-}: {
-  experience: ExperienceEntry
-  profiles: PersonProfile[]
-  currentUserId?: string
-  onCancel: () => void
-  onSaved: () => void
-}) {
-  const [values, setValues] = useState<Record<string, number>>(() =>
-    Object.fromEntries(experience.ratings.map((r) => [r.userId, r.rating])),
-  )
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  async function save() {
-    setBusy(true)
-    setError(null)
-    try {
-      await upsertRatings(
-        experience.id,
-        profiles.map((p) => ({ userId: p.id, rating: values[p.id] ?? 0 })),
-      )
-      onSaved()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo guardar.")
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface-2 p-3">
-      {profiles.map((person) => (
-        <div key={person.id} className="flex items-center justify-between gap-3">
-          <span className="text-sm text-ink">
-            {person.displayName}
-            {person.id === currentUserId && <span className="text-muted"> (vos)</span>}
-          </span>
-          <StarRatingInput
-            value={values[person.id] ?? 0}
-            onChange={(v) => setValues((prev) => ({ ...prev, [person.id]: v }))}
-          />
-        </div>
-      ))}
-
-      {error && <p className="text-xs text-rose-600 dark:text-rose-300">{error}</p>}
-
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={save}
-          disabled={busy}
-          className="rounded-lg bg-aqua px-3 py-1.5 text-sm font-semibold text-aqua-ink transition hover:brightness-105 disabled:opacity-50"
-        >
-          {busy ? "Guardando…" : "Guardar"}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted hover:text-ink"
-        >
-          Cancelar
-        </button>
-      </div>
-    </div>
   )
 }

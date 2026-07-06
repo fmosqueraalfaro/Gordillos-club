@@ -113,13 +113,14 @@ su nota → la doble puntuación vive en cada experiencia. Ver `docs/modelo-dato
   "Grupos de comida" quedó diferido a la fase de escalado (ADR-010).
 - **PWA instalable** (vite-plugin-pwa, ícono de marca, service worker auto-update);
   **medias estrellas** en la carga; **estadísticas** en el Diario (lugares/visitas/barrio
-  top/promedio de cada uno/mejor puntuado); **registro cerrado** en el login (club de dos).
-- **Pendiente de config (usuario):** (1) correr `0003_ratings_shared.sql` en Supabase;
-  (2) cerrar registros en Supabase (Auth → "Allow new users to sign up" → OFF);
-  (3) verificar topes de cuota/alerta de Google; (4) "Places API (New)" ya habilitada ✅.
+  top/promedio de cada uno/mejor puntuado); **registro cerrado** en el login (club de dos);
+  **editar y borrar experiencias** (fecha/plato/nota/fotos/notas + borrado con confirmación,
+  desde Diario y detalle; borrado compartido → migración `0004`).
+- **Pendiente de config (usuario):** correr `0004_experiences_shared_delete.sql` en Supabase.
+  (Ya hechos: `0003`, cierre de registros, cuotas de Google, "Places API (New)". ✅)
 - **Próximo paso:** Fase 3 — recomendaciones (motor propio + descubrimiento Places), y pulido
-  (filtros, editar/borrar resto, tags, pins de marca). Ver `docs/pendientes.md`.
-- Ver último detalle en `worklog/2026-07/2026-07-06-pwa-medias-stats.md`.
+  (filtros, tags, pins de marca, borrar lugar). Ver `docs/pendientes.md`.
+- Ver último detalle en `worklog/2026-07/2026-07-06-editar-borrar.md`.
 
 ---
 

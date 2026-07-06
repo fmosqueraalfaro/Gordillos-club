@@ -11,6 +11,7 @@ export type ExperienceRating = {
 export type ExperiencePhoto = {
   id: string
   url: string
+  storagePath: string
   caption: string | null
 }
 
@@ -61,6 +62,7 @@ function mapRow(row: any): ExperienceEntry {
     photos: (row.photos ?? []).map((p: any) => ({
       id: p.id,
       url: photoPublicUrl(p.storage_path),
+      storagePath: p.storage_path,
       caption: p.caption ?? null,
     })),
   }

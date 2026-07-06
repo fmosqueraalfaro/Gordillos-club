@@ -1,5 +1,7 @@
+import { useAuth } from "@/features/auth/AuthProvider"
+import { useProfiles } from "@/features/profiles/useProfiles"
 import { useExperiences } from "@/features/experiences/useExperiences"
-import { ExperienceCard } from "@/features/experiences/ExperienceCard"
+import { ExperienceRow } from "@/features/experiences/ExperienceRow"
 import { DiaryStats } from "@/features/diary/DiaryStats"
 import { MapPinIcon } from "@/components/ui/icons"
 
@@ -8,7 +10,9 @@ import { MapPinIcon } from "@/components/ui/icons"
  * Es el "ver a dónde fuimos".
  */
 export function DiaryView({ onGoToMap }: { onGoToMap?: () => void }) {
-  const { experiences, loading, error } = useExperiences()
+  const { user } = useAuth()
+  const { profiles } = useProfiles(user?.id)
+  const { experiences, loading, error, reload } = useExperiences()
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-28 pt-6">
@@ -42,7 +46,13 @@ export function DiaryView({ onGoToMap }: { onGoToMap?: () => void }) {
           <DiaryStats experiences={experiences} />
           <div className="flex flex-col gap-4">
             {experiences.map((exp) => (
-              <ExperienceCard key={exp.id} experience={exp} />
+              <ExperienceRow
+                key={exp.id}
+                experience={exp}
+                profiles={profiles}
+                currentUserId={user?.id}
+                onChanged={reload}
+              />
             ))}
           </div>
         </>
