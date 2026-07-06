@@ -61,13 +61,17 @@ Una visita/comida a un restaurante.
 | `id` | uuid (PK) | |
 | `restaurant_id` | uuid (FK restaurants) | |
 | `visited_on` | date | Fecha de la visita (default hoy) |
-| `dish` | text | Qué comimos ("milanesa napo") |
+| `starter` | text | **Entrada compartida** (una por experiencia). Mig. 0005. |
+| `price` | numeric(10,2) | **La cuenta** (total de la salida). Mig. 0005. |
 | `note` | text | Comentario / anécdota |
 | `created_by` | uuid (FK profiles) | Quién la cargó |
 | `created_at` / `updated_at` | timestamptz | |
 
-### `experience_ratings`
-La puntuación de una persona sobre una experiencia.
+> El viejo campo único `dish` se reemplazó (mig. 0005): la **entrada** es compartida (acá),
+> y el **principal** y el **postre** son **de cada uno** (en `experience_ratings`).
+
+### `experience_ratings` (lo de cada persona)
+La puntuación **y los platos** de cada persona sobre una experiencia.
 
 | Columna | Tipo | Notas |
 |---|---|---|
@@ -75,6 +79,8 @@ La puntuación de una persona sobre una experiencia.
 | `experience_id` | uuid (FK experiences) | |
 | `user_id` | uuid (FK profiles) | |
 | `rating` | numeric(2,1) | 1–5 estrellas (admite 4.5). CHECK 1–5. |
+| `main` | text | **Principal** de esa persona. Mig. 0005. |
+| `dessert` | text | **Postre** de esa persona (opcional). Mig. 0005. |
 | — | — | `UNIQUE (experience_id, user_id)` |
 
 ### `photos`

@@ -1,32 +1,40 @@
 import { supabase } from "@/lib/supabase"
-import type { NewExperienceInput, RatingInput } from "@/features/experiences/types"
+import type { NewExperienceInput, PersonEntry } from "@/features/experiences/types"
 
 /** Los datos de UNA visita (sin el lugar): sirven para lugar nuevo o existente. */
 export type VisitInput = {
   visitedOn: string // YYYY-MM-DD
-  dish: string
+  starter: string // entrada (compartida)
+  price: number | null // la cuenta (total)
   note: string
-  ratings: RatingInput[] // la nota de cada persona
+  people: PersonEntry[]
 }
 
-/** Inserta las notas (una por persona, si es > 0) de una experiencia. */
-async function insertRatings(experienceId: string, ratings: RatingInput[]) {
-  const rows = ratings
-    .filter((r) => r.rating > 0)
-    .map((r) => ({ experience_id: experienceId, user_id: r.userId, rating: r.rating }))
+/** Inserta la fila de cada persona (principal/postre/nota), si tiene nota > 0. */
+async function insertPeople(experienceId: string, people: PersonEntry[]) {
+  const rows = people
+    .filter((p) => p.rating > 0)
+    .map((p) => ({
+      experience_id: experienceId,
+      user_id: p.userId,
+      rating: p.rating,
+      main: p.main || null,
+      dessert: p.dessert || null,
+    }))
   if (rows.length === 0) return
   const { error } = await supabase.from("experience_ratings").insert(rows)
   if (error) throw error
 }
 
-/** Inserta la experiencia (visita) + las notas sobre un lugar ya conocido. */
+/** Inserta la experiencia (visita) + las filas de cada persona. */
 async function insertVisit(restaurantId: string, input: VisitInput, userId: string) {
   const { data: experience, error: eErr } = await supabase
     .from("experiences")
     .insert({
       restaurant_id: restaurantId,
       visited_on: input.visitedOn,
-      dish: input.dish || null,
+      starter: input.starter || null,
+      price: input.price,
       note: input.note || null,
       created_by: userId,
     })
@@ -34,12 +42,12 @@ async function insertVisit(restaurantId: string, input: VisitInput, userId: stri
     .single()
   if (eErr) throw eErr
 
-  await insertRatings(experience.id, input.ratings)
+  await insertPeople(experience.id, input.people)
   return experience.id as string
 }
 
 /**
- * Crea un lugar NUEVO + su primera experiencia + las notas, en cadena.
+ * Crea un lugar NUEVO + su primera experiencia + las filas de cada persona.
  * (Para sumar otra visita a un lugar YA existente, usar `addVisitToRestaurant`.)
  */
 export async function createExperience(input: NewExperienceInput, userId: string) {
@@ -70,16 +78,17 @@ export async function addVisitToRestaurant(
   return { restaurantId, experienceId }
 }
 
-/** Actualiza los datos de una experiencia (fecha, plato, nota). */
+/** Actualiza los datos compartidos de una experiencia (fecha, entrada, precio, nota). */
 export async function updateExperience(
   experienceId: string,
-  fields: { visitedOn: string; dish: string; note: string },
+  fields: { visitedOn: string; starter: string; price: number | null; note: string },
 ) {
   const { error } = await supabase
     .from("experiences")
     .update({
       visited_on: fields.visitedOn,
-      dish: fields.dish || null,
+      starter: fields.starter || null,
+      price: fields.price,
       note: fields.note || null,
     })
     .eq("id", experienceId)
@@ -87,7 +96,7 @@ export async function updateExperience(
 }
 
 /**
- * Borra una experiencia entera (cascada: sus notas y filas de fotos). Los
+ * Borra una experiencia entera (cascada: filas de cada persona y de fotos). Los
  * archivos de Storage se borran best-effort después.
  */
 export async function deleteExperience(experienceId: string) {
@@ -106,19 +115,20 @@ export async function deleteExperience(experienceId: string) {
 }
 
 /**
- * Crea/actualiza las notas de una experiencia existente (editar después).
- * Upsert por (experience_id, user_id): cada persona tiene UNA nota.
- * Una nota en 0 se interpreta como "sacarla" (se borra la fila).
+ * Crea/actualiza las filas de cada persona de una experiencia (editar después).
+ * Upsert por (experience_id, user_id): una fila por persona. Nota en 0 = se borra.
  */
-export async function upsertRatings(experienceId: string, ratings: RatingInput[]) {
-  const toSet = ratings.filter((r) => r.rating > 0)
-  const toClear = ratings.filter((r) => r.rating <= 0).map((r) => r.userId)
+export async function upsertPeople(experienceId: string, people: PersonEntry[]) {
+  const toSet = people.filter((p) => p.rating > 0)
+  const toClear = people.filter((p) => p.rating <= 0).map((p) => p.userId)
 
   if (toSet.length > 0) {
-    const rows = toSet.map((r) => ({
+    const rows = toSet.map((p) => ({
       experience_id: experienceId,
-      user_id: r.userId,
-      rating: r.rating,
+      user_id: p.userId,
+      rating: p.rating,
+      main: p.main || null,
+      dessert: p.dessert || null,
     }))
     const { error } = await supabase
       .from("experience_ratings")

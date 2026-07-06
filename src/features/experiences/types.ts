@@ -1,9 +1,11 @@
 export type DraftLocation = { lat: number; lng: number }
 
-/** La estrella de una persona (1–5) sobre una experiencia. */
-export type RatingInput = {
+/** Lo de cada persona en una experiencia: su principal, su postre y su nota. */
+export type PersonEntry = {
   userId: string
-  rating: number
+  rating: number // 1–5 (0 = sin nota → no se guarda esa fila)
+  main: string // principal (de cada uno)
+  dessert: string // postre (de cada uno, opcional)
 }
 
 export type NewExperienceInput = {
@@ -12,7 +14,8 @@ export type NewExperienceInput = {
   lat: number
   lng: number
   visitedOn: string // YYYY-MM-DD
-  dish: string
+  starter: string // entrada (compartida)
+  price: number | null // la cuenta (total)
   note: string
-  ratings: RatingInput[] // la nota de cada persona
+  people: PersonEntry[]
 }

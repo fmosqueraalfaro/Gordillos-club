@@ -60,10 +60,17 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
       los dos usuarios, implícito. La base ya soporta N notas por experiencia → es una capa de
       membresía encima, sin reescribir. Recién tiene sentido con más de dos personas.
 
-## 💡 Recomendaciones (Fase 3 — ver `recomendaciones.md`)
+## 💡 Recomendaciones y descubrimiento (Fase 3 — ver `recomendaciones.md`)
 
 - [ ] **Motor propio**: sugerir desde nuestra data por zona (lo mejor puntuado).
 - [ ] **Descubrimiento con Places**: lugares nuevos cerca, con rating real de Google.
+- [ ] **Bodegones por barrio** (idea de Caro): que la app diga qué bodegones tenemos/hay en
+      cada barrio. Requiere **tags** (marcar "bodegón") + agrupar por barrio (data propia), y
+      a futuro descubrir nuevos con Places por barrio. CABA = 48 barrios / 15 comunas.
+- [ ] **Mapa coloreado por barrio/comuna** (idea de Caro): en vez de (o además de) los pins
+      exactos, pintar los **polígonos de barrios/comunas** de CABA según cuántos bodegones
+      visitamos ahí (choropleth). CABA publica los GeoJSON de barrios y comunas; se overlayean
+      sobre Google Maps (`google.maps.Data`) con color por cantidad de visitas.
 
 ## 🎨 Pulido y marca
 
@@ -84,6 +91,10 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 
 ## ⚠️ Deuda técnica / cosas a tener en cuenta
 
+- **‼️ Correr `0005_courses_and_price.sql` en Supabase (SQL Editor → Run).** Cambia el modelo
+  de platos (entrada compartida + precio en `experiences`; principal/postre por persona en
+  `experience_ratings`; saca `dish`). **Hasta correrla, el Diario y el detalle tiran error**
+  (el front pide columnas que aún no existen).
 - **Correr en Supabase la migración `0003_ratings_shared.sql`** (SQL Editor → Run). Sin ella,
   guardar la nota del otro falla por RLS (cada uno solo podría escribir la suya).
 - **Correr en Supabase la migración `0004_experiences_shared_delete.sql`** (SQL Editor → Run).
@@ -99,7 +110,6 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 - El "Agregar" del mapa siempre crea un lugar nuevo; para sumar a uno existente se entra por
   el pin → "Sumar visita acá". (No hay merge de duplicados si ya se crearon dos pins iguales.)
 - El barrio se carga a mano (sin reverse geocoding).
-- El input de estrellas es de enteros (la DB admite medias).
 - Si algún día cambia el dominio de Vercel, hay que **agregarlo a las restricciones de la
   key de Google Maps** (si no, el mapa no carga).
 - Las variables de entorno viven en dos lados: `.env` (local) y **Vercel** (producción). Si

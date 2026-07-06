@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { StarRatingInput } from "@/components/ui/StarRatingInput"
 import { PlusIcon } from "@/components/ui/icons"
-import { updateExperience, upsertRatings } from "@/features/experiences/createExperience"
+import { updateExperience, upsertPeople } from "@/features/experiences/createExperience"
 import { uploadExperiencePhotos, deletePhotos } from "@/features/experiences/photos"
 import type { ExperienceEntry, ExperiencePhoto } from "@/features/experiences/useExperiences"
 import type { PersonProfile } from "@/features/profiles/useProfiles"
@@ -12,7 +12,7 @@ import type { PersonProfile } from "@/features/profiles/useProfiles"
 const TEXTAREA_CLASS =
   "w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-muted/60 focus:border-aqua focus:ring-2 focus:ring-aqua/25"
 
-/** Editar una experiencia existente: fecha, plato, nota, fotos y las notas. */
+/** Editar una experiencia existente: fecha, entrada, precio, nota, fotos y lo de cada uno. */
 export function EditExperienceSheet({
   experience,
   profiles,
@@ -27,10 +27,17 @@ export function EditExperienceSheet({
   onSaved: () => void
 }) {
   const [visitedOn, setVisitedOn] = useState(experience.visitedOn)
-  const [dish, setDish] = useState(experience.dish ?? "")
+  const [starter, setStarter] = useState(experience.starter ?? "")
+  const [price, setPrice] = useState(experience.price != null ? String(experience.price) : "")
   const [note, setNote] = useState(experience.note ?? "")
   const [ratings, setRatings] = useState<Record<string, number>>(() =>
-    Object.fromEntries(experience.ratings.map((r) => [r.userId, r.rating])),
+    Object.fromEntries(experience.people.map((p) => [p.userId, p.rating])),
+  )
+  const [mains, setMains] = useState<Record<string, string>>(() =>
+    Object.fromEntries(experience.people.map((p) => [p.userId, p.main ?? ""])),
+  )
+  const [desserts, setDesserts] = useState<Record<string, string>>(() =>
+    Object.fromEntries(experience.people.map((p) => [p.userId, p.dessert ?? ""])),
   )
   const [keptPhotos, setKeptPhotos] = useState<ExperiencePhoto[]>(experience.photos)
   const [removedPhotos, setRemovedPhotos] = useState<ExperiencePhoto[]>([])
@@ -61,13 +68,27 @@ export function EditExperienceSheet({
     e.preventDefault()
     if (!currentUserId) return
     if (!hasRating) return setError("Tiene que haber al menos una puntuación.")
+    const priceNum = price.trim() ? Number(price) : null
+    if (priceNum != null && (Number.isNaN(priceNum) || priceNum < 0)) {
+      return setError("El precio tiene que ser un número.")
+    }
     setBusy(true)
     setError(null)
     try {
-      await updateExperience(experience.id, { visitedOn, dish: dish.trim(), note: note.trim() })
-      await upsertRatings(
+      await updateExperience(experience.id, {
+        visitedOn,
+        starter: starter.trim(),
+        price: priceNum,
+        note: note.trim(),
+      })
+      await upsertPeople(
         experience.id,
-        profiles.map((p) => ({ userId: p.id, rating: ratings[p.id] ?? 0 })),
+        profiles.map((p) => ({
+          userId: p.id,
+          rating: ratings[p.id] ?? 0,
+          main: mains[p.id] ?? "",
+          dessert: desserts[p.id] ?? "",
+        })),
       )
       if (removedPhotos.length > 0) await deletePhotos(removedPhotos)
       if (newFiles.length > 0) {
@@ -111,26 +132,58 @@ export function EditExperienceSheet({
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
-            Fecha
-            <Input type="date" value={visitedOn} max={today} onChange={(e) => setVisitedOn(e.target.value)} />
-          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+              Fecha
+              <Input type="date" value={visitedOn} max={today} onChange={(e) => setVisitedOn(e.target.value)} />
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+              Precio <span className="font-normal text-muted">(la cuenta)</span>
+              <Input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="$ total"
+              />
+            </label>
+          </div>
 
           <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
-            ¿Qué comieron? <span className="font-normal text-muted">(opcional)</span>
-            <Input value={dish} onChange={(e) => setDish(e.target.value)} placeholder="Milanesa napo, fugazzeta…" />
+            Entrada <span className="font-normal text-muted">(compartida, opcional)</span>
+            <Input value={starter} onChange={(e) => setStarter(e.target.value)} placeholder="Provoleta, empanadas…" />
           </label>
 
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
-            Nota <span className="font-normal text-muted">(opcional)</span>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={2}
-              placeholder="Cómo estuvo, con qué lo acompañaron…"
-              className={TEXTAREA_CLASS}
-            />
-          </label>
+          {/* Lo de cada uno */}
+          <div className="flex flex-col gap-4 rounded-xl bg-surface-2 p-3">
+            <p className="text-sm font-medium text-ink">Lo de cada uno</p>
+            {profiles.map((person) => (
+              <div key={person.id} className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-ink">
+                  {person.displayName}
+                  {person.id === currentUserId && <span className="font-normal text-muted"> (vos)</span>}
+                </span>
+                <Input
+                  value={mains[person.id] ?? ""}
+                  onChange={(e) => setMains((prev) => ({ ...prev, [person.id]: e.target.value }))}
+                  placeholder="Principal (bife, ravioles…)"
+                />
+                <Input
+                  value={desserts[person.id] ?? ""}
+                  onChange={(e) => setDesserts((prev) => ({ ...prev, [person.id]: e.target.value }))}
+                  placeholder="Postre (opcional)"
+                />
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs text-muted">Puntuación</span>
+                  <StarRatingInput
+                    value={ratings[person.id] ?? 0}
+                    onChange={(v) => setRatings((prev) => ({ ...prev, [person.id]: v }))}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
 
           {/* Fotos: existentes (con quitar) + nuevas */}
           <div className="flex flex-col gap-2 text-sm font-medium text-ink">
@@ -181,24 +234,16 @@ export function EditExperienceSheet({
             </div>
           </div>
 
-          {/* Doble puntuación */}
-          <div className="flex flex-col gap-3 rounded-xl bg-surface-2 p-3">
-            <p className="text-sm font-medium text-ink">
-              Puntuaciones <span className="font-normal text-muted">(la de cada uno)</span>
-            </p>
-            {profiles.map((person) => (
-              <div key={person.id} className="flex items-center justify-between gap-3">
-                <span className="text-sm text-ink">
-                  {person.displayName}
-                  {person.id === currentUserId && <span className="text-muted"> (vos)</span>}
-                </span>
-                <StarRatingInput
-                  value={ratings[person.id] ?? 0}
-                  onChange={(v) => setRatings((prev) => ({ ...prev, [person.id]: v }))}
-                />
-              </div>
-            ))}
-          </div>
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+            Nota <span className="font-normal text-muted">(opcional)</span>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={2}
+              placeholder="Cómo estuvo, con qué lo acompañaron…"
+              className={TEXTAREA_CLASS}
+            />
+          </label>
 
           {error && (
             <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-300">

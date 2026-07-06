@@ -8,7 +8,7 @@ import { StarRatingInput } from "@/components/ui/StarRatingInput"
 import { MapPinIcon, PlusIcon } from "@/components/ui/icons"
 import { createExperience, addVisitToRestaurant } from "@/features/experiences/createExperience"
 import { uploadExperiencePhotos } from "@/features/experiences/photos"
-import type { DraftLocation, RatingInput } from "@/features/experiences/types"
+import type { DraftLocation, PersonEntry } from "@/features/experiences/types"
 
 const TEXTAREA_CLASS =
   "w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-muted/60 focus:border-aqua focus:ring-2 focus:ring-aqua/25"
@@ -32,15 +32,17 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
   const [name, setName] = useState(prefill?.name ?? "")
   const [neighborhood, setNeighborhood] = useState(prefill?.neighborhood ?? "")
   const [visitedOn, setVisitedOn] = useState(() => new Date().toISOString().slice(0, 10))
-  const [dish, setDish] = useState("")
+  const [starter, setStarter] = useState("")
+  const [price, setPrice] = useState("")
   const [note, setNote] = useState("")
   const [ratings, setRatings] = useState<Record<string, number>>({})
+  const [mains, setMains] = useState<Record<string, string>>({})
+  const [desserts, setDesserts] = useState<Record<string, string>>({})
   const [files, setFiles] = useState<File[]>([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Previsualización de las fotos elegidas (y limpieza de las object URLs).
   const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files])
   useEffect(() => () => previews.forEach(URL.revokeObjectURL), [previews])
 
@@ -48,10 +50,6 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
   const nameOk = isExisting || name.trim().length > 0
   const hasRating = Object.values(ratings).some((v) => v > 0)
   const canSave = nameOk && hasRating && !busy
-
-  function setRatingFor(userId: string, value: number) {
-    setRatings((prev) => ({ ...prev, [userId]: value }))
-  }
 
   function addFiles(list: FileList | null) {
     if (!list) return
@@ -68,14 +66,26 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
     if (!user) return
     if (!isExisting && !name.trim()) return setError("Ponele un nombre al lugar.")
     if (!hasRating) return setError("Elegí al menos una puntuación.")
+    const priceNum = price.trim() ? Number(price) : null
+    if (priceNum != null && (Number.isNaN(priceNum) || priceNum < 0)) {
+      return setError("El precio tiene que ser un número.")
+    }
     setBusy(true)
     setError(null)
     try {
-      const ratingList: RatingInput[] = profiles.map((p) => ({
+      const people: PersonEntry[] = profiles.map((p) => ({
         userId: p.id,
         rating: ratings[p.id] ?? 0,
+        main: mains[p.id] ?? "",
+        dessert: desserts[p.id] ?? "",
       }))
-      const visit = { visitedOn, dish: dish.trim(), note: note.trim(), ratings: ratingList }
+      const visit = {
+        visitedOn,
+        starter: starter.trim(),
+        price: priceNum,
+        note: note.trim(),
+        people,
+      }
       const result =
         props.mode === "existing"
           ? await addVisitToRestaurant(props.restaurant.id, visit, user.id)
@@ -94,7 +104,6 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
         try {
           await uploadExperiencePhotos(result.experienceId, files, user.id)
         } catch (photoErr) {
-          // La visita ya se guardó; no bloqueamos por una foto que falló.
           console.warn("No se pudieron subir algunas fotos:", photoErr)
         }
       }
@@ -151,26 +160,58 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
             </>
           )}
 
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
-            Fecha
-            <Input type="date" value={visitedOn} max={today} onChange={(e) => setVisitedOn(e.target.value)} />
-          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+              Fecha
+              <Input type="date" value={visitedOn} max={today} onChange={(e) => setVisitedOn(e.target.value)} />
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+              Precio <span className="font-normal text-muted">(la cuenta)</span>
+              <Input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="$ total"
+              />
+            </label>
+          </div>
 
           <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
-            ¿Qué comieron? <span className="font-normal text-muted">(opcional)</span>
-            <Input value={dish} onChange={(e) => setDish(e.target.value)} placeholder="Milanesa napo, fugazzeta…" />
+            Entrada <span className="font-normal text-muted">(compartida, opcional)</span>
+            <Input value={starter} onChange={(e) => setStarter(e.target.value)} placeholder="Provoleta, empanadas…" />
           </label>
 
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
-            Tu nota <span className="font-normal text-muted">(opcional)</span>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={2}
-              placeholder="Cómo estuvo, con qué lo acompañaron…"
-              className={TEXTAREA_CLASS}
-            />
-          </label>
+          {/* Lo de cada uno: principal + postre + estrellas */}
+          <div className="flex flex-col gap-4 rounded-xl bg-surface-2 p-3">
+            <p className="text-sm font-medium text-ink">Lo de cada uno</p>
+            {profiles.map((person) => (
+              <div key={person.id} className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-ink">
+                  {person.displayName}
+                  {person.id === user?.id && <span className="font-normal text-muted"> (vos)</span>}
+                </span>
+                <Input
+                  value={mains[person.id] ?? ""}
+                  onChange={(e) => setMains((prev) => ({ ...prev, [person.id]: e.target.value }))}
+                  placeholder="Principal (bife, ravioles…)"
+                />
+                <Input
+                  value={desserts[person.id] ?? ""}
+                  onChange={(e) => setDesserts((prev) => ({ ...prev, [person.id]: e.target.value }))}
+                  placeholder="Postre (opcional)"
+                />
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs text-muted">Puntuación</span>
+                  <StarRatingInput
+                    value={ratings[person.id] ?? 0}
+                    onChange={(v) => setRatings((prev) => ({ ...prev, [person.id]: v }))}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
 
           {/* Fotos */}
           <div className="flex flex-col gap-2 text-sm font-medium text-ink">
@@ -208,24 +249,16 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
             </div>
           </div>
 
-          {/* Doble puntuación: una estrella por cada uno */}
-          <div className="flex flex-col gap-3 rounded-xl bg-surface-2 p-3">
-            <p className="text-sm font-medium text-ink">
-              Puntuaciones <span className="font-normal text-muted">(la de cada uno)</span>
-            </p>
-            {profiles.map((person) => (
-              <div key={person.id} className="flex items-center justify-between gap-3">
-                <span className="text-sm text-ink">
-                  {person.displayName}
-                  {person.id === user?.id && <span className="text-muted"> (vos)</span>}
-                </span>
-                <StarRatingInput
-                  value={ratings[person.id] ?? 0}
-                  onChange={(v) => setRatingFor(person.id, v)}
-                />
-              </div>
-            ))}
-          </div>
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+            Nota <span className="font-normal text-muted">(opcional)</span>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={2}
+              placeholder="Cómo estuvo, con qué lo acompañaron…"
+              className={TEXTAREA_CLASS}
+            />
+          </label>
 
           {error && (
             <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-300">

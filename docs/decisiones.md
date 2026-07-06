@@ -116,3 +116,20 @@ descartamos. Formato liviano tipo ADR (Architecture Decision Record). Orden cron
   que se suma **encima sin reescribir**. Ver `docs/pendientes.md` (sección futuro).
 - **Alternativas descartadas:** cada uno carga su nota desde su cuenta (más seguro pero con
   fricción); sistema de grupos ahora (sobredimensionado para dos usuarios).
+
+## ADR-011 — Platos: entrada compartida, principal/postre de cada uno, precio
+- **Fecha:** 2026-07-06
+- **Estado:** Aceptada
+- **Decisión:** el viejo campo único `dish` se reemplaza por un modelo más fiel a cómo comen:
+  - **Entrada:** compartida (una, en `experiences.starter`).
+  - **Precio:** la cuenta total (en `experiences.price`).
+  - **Principal** y **postre:** **de cada uno** (en `experience_ratings.main` / `.dessert`,
+    junto a la nota de cada persona). El postre es opcional.
+  Migración `0005_courses_and_price.sql` (backfill `dish` → `starter`).
+- **Por qué:** feedback de uso real (Caro): la entrada se comparte, el plato principal y el
+  postre son de cada uno, y quieren registrar la cuenta. Lo "de cada uno" viaja naturalmente
+  en la fila por-persona que ya existía.
+- **También:** la tarjeta de experiencia ahora se **abre** a un detalle con la **foto grande**
+  y todo el desglose (antes la foto casi no se veía).
+- **Alternativas descartadas:** cuatro campos compartidos (no refleja el "de cada uno");
+  tabla nueva de platos por persona (la fila de `experience_ratings` ya es por persona).

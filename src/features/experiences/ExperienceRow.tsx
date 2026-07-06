@@ -1,13 +1,14 @@
 import { useState } from "react"
 import { ExperienceCard } from "@/features/experiences/ExperienceCard"
+import { ExperienceDetailSheet } from "@/features/experiences/ExperienceDetailSheet"
 import { EditExperienceSheet } from "@/features/experiences/EditExperienceSheet"
 import { deleteExperience } from "@/features/experiences/createExperience"
 import type { ExperienceEntry } from "@/features/experiences/useExperiences"
 import type { PersonProfile } from "@/features/profiles/useProfiles"
 
 /**
- * Una experiencia con acciones de editar y borrar. Se usa en el Diario y en el
- * detalle de un lugar. `onChanged` refresca la lista de arriba.
+ * Una experiencia con: abrir (foto grande + detalle), editar y borrar. Se usa en
+ * el Diario y en el detalle de un lugar. `onChanged` refresca la lista de arriba.
  */
 export function ExperienceRow({
   experience,
@@ -22,6 +23,7 @@ export function ExperienceRow({
   showPlace?: boolean
   onChanged: () => void
 }) {
+  const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -40,7 +42,7 @@ export function ExperienceRow({
 
   return (
     <div className="flex flex-col gap-2">
-      <ExperienceCard experience={experience} showPlace={showPlace} />
+      <ExperienceCard experience={experience} showPlace={showPlace} onOpen={() => setOpen(true)} />
 
       <div className="flex items-center gap-3 px-1">
         {!confirming ? (
@@ -81,6 +83,17 @@ export function ExperienceRow({
           </>
         )}
       </div>
+
+      {open && (
+        <ExperienceDetailSheet
+          experience={experience}
+          onClose={() => setOpen(false)}
+          onEdit={() => {
+            setOpen(false)
+            setEditing(true)
+          }}
+        />
+      )}
 
       {editing && (
         <EditExperienceSheet

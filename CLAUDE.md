@@ -116,11 +116,14 @@ su nota → la doble puntuación vive en cada experiencia. Ver `docs/modelo-dato
   top/promedio de cada uno/mejor puntuado); **registro cerrado** en el login (club de dos);
   **editar y borrar experiencias** (fecha/plato/nota/fotos/notas + borrado con confirmación,
   desde Diario y detalle; borrado compartido → migración `0004`).
-- **Pendiente de config (usuario):** correr `0004_experiences_shared_delete.sql` en Supabase.
-  (Ya hechos: `0003`, cierre de registros, cuotas de Google, "Places API (New)". ✅)
-- **Próximo paso:** Fase 3 — recomendaciones (motor propio + descubrimiento Places), y pulido
-  (filtros, tags, pins de marca, borrar lugar). Ver `docs/pendientes.md`.
-- Ver último detalle en `worklog/2026-07/2026-07-06-editar-borrar.md`.
+- **Platos como se comen** (ADR-011): **entrada compartida** + **precio** (la cuenta) en la
+  experiencia; **principal** y **postre** (opcional) **de cada uno**. La tarjeta se **abre**
+  a un detalle con **foto grande** y todo el desglose. Reemplaza el campo único `dish`.
+- **Pendiente de config (usuario): ‼️ correr `0005_courses_and_price.sql`** (sin esto el
+  Diario tira error). (Ya hechos: `0003`, `0004`, cierre de registros, cuotas, Places. ✅)
+- **Próximo paso:** Fase 3 — recomendaciones + **bodegones por barrio** + **mapa coloreado por
+  barrio/comuna** (ideas de Caro); pulido (filtros, tags, pins de marca). Ver `docs/pendientes.md`.
+- Ver último detalle en `worklog/2026-07/2026-07-06-platos-y-detalle.md`.
 
 ---
 

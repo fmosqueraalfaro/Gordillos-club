@@ -33,7 +33,7 @@ export function RestaurantDetailSheet({
   const perPerson = useMemo(() => {
     const map = new Map<string, { name: string; sum: number; count: number }>()
     for (const exp of experiences) {
-      for (const r of exp.ratings) {
+      for (const r of exp.people) {
         const cur = map.get(r.userId) ?? { name: r.name, sum: 0, count: 0 }
         cur.sum += r.rating
         cur.count += 1

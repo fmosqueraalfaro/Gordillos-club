@@ -22,7 +22,7 @@ export function DiaryStats({ experiences }: { experiences: ExperienceEntry[] }) 
           (neighborhoods.get(exp.restaurant.neighborhood) ?? 0) + 1,
         )
       }
-      for (const r of exp.ratings) {
+      for (const r of exp.people) {
         const u = perUser.get(r.userId) ?? { name: r.name, sum: 0, count: 0 }
         u.sum += r.rating
         u.count += 1

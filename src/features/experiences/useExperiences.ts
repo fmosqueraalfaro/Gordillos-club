@@ -2,10 +2,12 @@ import { useCallback, useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { photoPublicUrl } from "@/features/experiences/photos"
 
-export type ExperienceRating = {
-  rating: number
+export type ExperiencePerson = {
   userId: string
   name: string
+  rating: number
+  main: string | null // principal
+  dessert: string | null // postre
 }
 
 export type ExperiencePhoto = {
@@ -18,7 +20,8 @@ export type ExperiencePhoto = {
 export type ExperienceEntry = {
   id: string
   visitedOn: string // YYYY-MM-DD
-  dish: string | null
+  starter: string | null // entrada (compartida)
+  price: number | null // la cuenta (total)
   note: string | null
   createdAt: string
   restaurant: {
@@ -28,14 +31,14 @@ export type ExperienceEntry = {
     lat: number
     lng: number
   }
-  ratings: ExperienceRating[]
+  people: ExperiencePerson[]
   photos: ExperiencePhoto[]
 }
 
 const SELECT = `
-  id, visited_on, dish, note, created_at,
+  id, visited_on, starter, price, note, created_at,
   restaurant:restaurants!inner ( id, name, neighborhood, lat, lng ),
-  ratings:experience_ratings ( rating, user_id, user:profiles ( id, display_name ) ),
+  people:experience_ratings ( rating, user_id, main, dessert, user:profiles ( id, display_name ) ),
   photos ( id, storage_path, caption )
 `
 
@@ -44,7 +47,8 @@ function mapRow(row: any): ExperienceEntry {
   return {
     id: row.id,
     visitedOn: row.visited_on,
-    dish: row.dish,
+    starter: row.starter,
+    price: row.price != null ? Number(row.price) : null,
     note: row.note,
     createdAt: row.created_at,
     restaurant: {
@@ -54,10 +58,12 @@ function mapRow(row: any): ExperienceEntry {
       lat: row.restaurant.lat,
       lng: row.restaurant.lng,
     },
-    ratings: (row.ratings ?? []).map((r: any) => ({
-      rating: Number(r.rating),
-      userId: r.user_id,
-      name: r.user?.display_name ?? "Alguien",
+    people: (row.people ?? []).map((p: any) => ({
+      userId: p.user_id,
+      name: p.user?.display_name ?? "Alguien",
+      rating: Number(p.rating),
+      main: p.main ?? null,
+      dessert: p.dessert ?? null,
     })),
     photos: (row.photos ?? []).map((p: any) => ({
       id: p.id,
@@ -70,9 +76,9 @@ function mapRow(row: any): ExperienceEntry {
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 /**
- * Trae experiencias (visitas) con su lugar y las notas de cada persona.
- * Con `restaurantId` filtra las de un solo lugar (para el detalle del pin);
- * sin él, trae todas ordenadas de la más nueva a la más vieja (el Diario).
+ * Trae experiencias (visitas) con su lugar, lo de cada persona y las fotos.
+ * Con `restaurantId` filtra las de un solo lugar (detalle del pin); sin él,
+ * trae todas ordenadas de la más nueva a la más vieja (el Diario).
  */
 export function useExperiences(restaurantId?: string) {
   const [experiences, setExperiences] = useState<ExperienceEntry[]>([])
