@@ -92,10 +92,12 @@ persona. Eso habilita comparar y promediar.
 ## 5. Estado del proyecto
 
 - **Fase actual:** 🏗️ Fase 1 — Fundaciones (iniciada 2026-07-05).
-- **Hecho:** documentación base + scaffold del frontend (React 19 + Vite 8 + TS 6 +
-  Tailwind v4 + alias `@/`). Build y dev server verificados OK. Paleta pastel verde agua.
-- **Próximo paso:** inicializar git; luego Supabase (DB + esquema) o layout/navegación base.
-- Ver último detalle en `worklog/2026-07/2026-07-05-scaffold-frontend.md`.
+- **Hecho:** documentación base; scaffold (React 19 + Vite 8 + TS 6 + Tailwind v4);
+  Supabase conectado (esquema aplicado + verificado); **auth + layout base** (login/registro,
+  sesión, header con logout). Build y dev verificados OK.
+- **Próximo paso:** crear las cuentas reales (👤) y arrancar el **mapa** (Google Maps) + alta
+  de restaurantes.
+- Ver último detalle en `worklog/2026-07/2026-07-05-auth-y-layout.md`.
 
 ---
 
