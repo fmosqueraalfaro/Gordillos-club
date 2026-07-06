@@ -61,3 +61,24 @@ descartamos. Formato liviano tipo ADR (Architecture Decision Record). Orden cron
   admitidas (ej. 4.5). En la DB: `numeric(2,1)` con CHECK entre 1 y 5.
 - **Por qué:** las estrellas 1–5 son universalmente entendibles, alineadas con Google, y
   fáciles de mostrar en mobile. Descartamos 0–10 por ser menos visual.
+
+## ADR-007 — Identidad visual: fríos + verde agua, tipografía editorial
+- **Fecha:** 2026-07-06
+- **Estado:** Aceptada
+- **Decisión:** sistema de diseño con **tonos fríos** (no pastel) y **verde agua** (`#0FB4A3`)
+  como único acento vibrante; **modo claro por defecto** + toggle a oscuro (persistido).
+  Tipografía: **Fraunces** (display, editorial/gastronómica) + **Hanken Grotesk** (cuerpo),
+  self-hosteadas vía Fontsource. Firma del producto: la **doble puntuación** (él/ella).
+- **Por qué:** el usuario rechazó el look pastel teal genérico; quería algo frío, con
+  carácter y verde agua. Se siguió la skill `frontend-design` (evitar defaults, gastar la
+  audacia en un solo lugar = la firma).
+- **Alternativas descartadas:** paleta pastel (rechazada por el usuario); Inter como body
+  (demasiado genérico).
+
+## ADR-008 — Nombre del producto: Gordillos Club
+- **Fecha:** 2026-07-06
+- **Estado:** Aceptada
+- **Decisión:** el producto se llama **Gordillos Club** ("gordillos" = forma cariñosa de
+  "gordos de comer"). El repo/carpeta mantiene el codename `Restaurant-Judge`.
+- **Por qué:** nombre personal y cálido, con aire de "club de dos socios". Elegido entre
+  varias opciones (Comité Gordillo, Los Gordillos, Ruta Gordilla).

@@ -1,8 +1,12 @@
-# Restaurant Judge 🍽️
+# Gordillos Club 🍽️
 
 App personal para registrar en un mapa los restaurantes que visitamos por zona/barrio,
 puntuarlos, dejar comentarios y ver el historial. Uso personal (dos personas) con posible
 escalado futuro a nivel producto/ventas.
+
+> **Nombre del producto:** Gordillos Club ("gordillos" = forma cariñosa de "gordos de
+> comer"). El repo/carpeta conserva el codename original `Restaurant-Judge` por historia;
+> en la UI y de cara al usuario siempre es **Gordillos Club**.
 
 > Este archivo es el contexto principal del proyecto. Se lee al iniciar cada sesión.
 > Mantenerlo actualizado y prolijo. Las decisiones detalladas viven en `docs/`.
@@ -93,11 +97,12 @@ persona. Eso habilita comparar y promediar.
 
 - **Fase actual:** 🏗️ Fase 1 — Fundaciones (iniciada 2026-07-05).
 - **Hecho:** documentación base; scaffold (React 19 + Vite 8 + TS 6 + Tailwind v4);
-  Supabase conectado (esquema aplicado + verificado); **auth + layout base** (login/registro,
-  sesión, header con logout). Build y dev verificados OK.
+  Supabase conectado (esquema aplicado + verificado); **auth + layout base**; **identidad
+  visual** (paleta fría + verde agua, claro/oscuro, Fraunces + Hanken, firma doble puntuación);
+  **nombre Gordillos Club**. Build y dev verificados OK.
 - **Próximo paso:** crear las cuentas reales (👤) y arrancar el **mapa** (Google Maps) + alta
   de restaurantes.
-- Ver último detalle en `worklog/2026-07/2026-07-05-auth-y-layout.md`.
+- Ver último detalle en `worklog/2026-07/2026-07-06-rediseno-y-nombre.md`.
 
 ---
 
