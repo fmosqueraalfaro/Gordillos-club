@@ -5,7 +5,9 @@ import { useExperiences } from "@/features/experiences/useExperiences"
 import { ExperienceRow } from "@/features/experiences/ExperienceRow"
 import { AddExperienceSheet } from "@/features/experiences/AddExperienceSheet"
 import { RatingStrip } from "@/components/ratings/DualRating"
+import { TagsInput } from "@/components/ui/TagsInput"
 import { MapPinIcon, PlusIcon } from "@/components/ui/icons"
+import { updateRestaurantTags } from "@/features/restaurants/updateRestaurant"
 import type { Restaurant } from "@/features/restaurants/types"
 
 /**
@@ -26,6 +28,22 @@ export function RestaurantDetailSheet({
   const { profiles } = useProfiles(user?.id)
   const { experiences, loading, error, reload } = useExperiences(restaurant.id)
   const [adding, setAdding] = useState(false)
+  const [tags, setTags] = useState<string[]>(restaurant.tags)
+  const [editingTags, setEditingTags] = useState(false)
+  const [savingTags, setSavingTags] = useState(false)
+
+  async function saveTags() {
+    setSavingTags(true)
+    try {
+      await updateRestaurantTags(restaurant.id, tags)
+      setEditingTags(false)
+      onChanged?.()
+    } catch (err) {
+      console.warn("No se pudieron guardar los tags:", err)
+    } finally {
+      setSavingTags(false)
+    }
+  }
 
   const visits = experiences.length
 
@@ -78,6 +96,53 @@ export function RestaurantDetailSheet({
             >
               ✕
             </button>
+          </div>
+
+          {/* Tags del lugar */}
+          <div className="mb-4">
+            {editingTags ? (
+              <div className="flex flex-col gap-2">
+                <TagsInput value={tags} onChange={setTags} />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={saveTags}
+                    disabled={savingTags}
+                    className="rounded-lg bg-aqua px-3 py-1.5 text-sm font-semibold text-aqua-ink transition hover:brightness-105 disabled:opacity-50"
+                  >
+                    {savingTags ? "Guardando…" : "Guardar tags"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTags(restaurant.tags)
+                      setEditingTags(false)
+                    }}
+                    className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted hover:text-ink"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-surface-2 px-2.5 py-1 text-xs font-medium text-muted"
+                  >
+                    {tag}
+                  </span>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setEditingTags(true)}
+                  className="rounded-full border border-dashed border-border px-2.5 py-1 text-xs font-medium text-aqua hover:border-aqua"
+                >
+                  {tags.length > 0 ? "Editar tags" : "+ Agregar tags"}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Resumen: la nota de cada uno + cantidad de visitas */}

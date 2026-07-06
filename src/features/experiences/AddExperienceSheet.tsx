@@ -4,6 +4,7 @@ import { useAuth } from "@/features/auth/AuthProvider"
 import { useProfiles } from "@/features/profiles/useProfiles"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
+import { TagsInput } from "@/components/ui/TagsInput"
 import { StarRatingInput } from "@/components/ui/StarRatingInput"
 import { MapPinIcon, PlusIcon } from "@/components/ui/icons"
 import { createExperience, addVisitToRestaurant } from "@/features/experiences/createExperience"
@@ -32,6 +33,7 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
   const [name, setName] = useState(prefill?.name ?? "")
   const [neighborhood, setNeighborhood] = useState(prefill?.neighborhood ?? "")
   const [visitedOn, setVisitedOn] = useState(() => new Date().toISOString().slice(0, 10))
+  const [tags, setTags] = useState<string[]>([])
   const [starter, setStarter] = useState("")
   const [price, setPrice] = useState("")
   const [note, setNote] = useState("")
@@ -93,6 +95,7 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
               {
                 name: name.trim(),
                 neighborhood: neighborhood.trim() || null,
+                tags,
                 lat: props.location.lat,
                 lng: props.location.lng,
                 ...visit,
@@ -157,6 +160,11 @@ export function AddExperienceSheet(props: AddExperienceSheetProps) {
                 Barrio <span className="font-normal text-muted">(opcional)</span>
                 <Input value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} placeholder="Palermo, Villa Crespo…" />
               </label>
+
+              <div className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+                Tags <span className="font-normal text-muted">(parrilla, bodegón…)</span>
+                <TagsInput value={tags} onChange={setTags} />
+              </div>
             </>
           )}
 

@@ -52,6 +52,18 @@ export function ExperienceCard({
             {restaurant.name}
           </h3>
           <p className="mt-1 text-xs text-muted">{meta}</p>
+          {restaurant.tags.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {restaurant.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs font-medium text-muted"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </>
       ) : (
         <p className="text-xs font-medium uppercase tracking-wide text-muted">{meta}</p>

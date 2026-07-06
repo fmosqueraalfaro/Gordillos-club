@@ -58,6 +58,7 @@ export async function createExperience(input: NewExperienceInput, userId: string
       lat: input.lat,
       lng: input.lng,
       neighborhood: input.neighborhood,
+      tags: input.tags,
       created_by: userId,
     })
     .select("id")

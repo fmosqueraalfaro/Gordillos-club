@@ -121,12 +121,13 @@ su nota → la doble puntuación vive en cada experiencia. Ver `docs/modelo-dato
   a un detalle con **foto grande** y todo el desglose. Reemplaza el campo único `dish`.
 - **Pendiente de config (usuario): ‼️ correr `0005_courses_and_price.sql`** (sin esto el
   Diario tira error). (Ya hechos: `0003`, `0004`, cierre de registros, cuotas, Places. ✅)
-- **Mapa coloreado por barrio** (choropleth): toggle "Barrios" en el mapa pinta los 48 barrios
-  de CABA según lugares visitados (leyenda + tocar = nombre/cantidad). GeoJSON en
-  `public/caba-barrios.geojson`, conteo por punto-en-polígono. Sin migración (todo front).
-- **Próximo paso:** **tags** (marcar "bodegón" → cruzarlo con el mapa de barrios) + **filtros**;
-  recomendaciones; pulido (pins de marca, comuna). Ver `docs/pendientes.md`.
-- Ver último detalle en `worklog/2026-07/2026-07-06-mapa-barrios.md`.
+- **Mapa coloreado por barrio** (choropleth): toggle "Barrios" → ámbar donde no fuimos, verde
+  donde sí; **filtro por tag** (ej. "Sólo: Bodegón"). GeoJSON en `public/caba-barrios.geojson`.
+- **Tags** por lugar (chips; alta + edición en el detalle) y **filtros** en el Diario (barrio,
+  tag, puntuación). Ambos sin migración (`restaurants.tags` ya existía).
+- **Próximo paso:** recomendaciones (motor propio + descubrimiento Places), vista por comuna,
+  pins de marca, borrar lugar, perfil. Ver `docs/pendientes.md`.
+- Ver último detalle en `worklog/2026-07/2026-07-06-tags-filtros.md`.
 
 ---
 

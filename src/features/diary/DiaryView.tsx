@@ -1,18 +1,49 @@
+import { useMemo, useState } from "react"
 import { useAuth } from "@/features/auth/AuthProvider"
 import { useProfiles } from "@/features/profiles/useProfiles"
 import { useExperiences } from "@/features/experiences/useExperiences"
+import type { ExperienceEntry } from "@/features/experiences/useExperiences"
 import { ExperienceRow } from "@/features/experiences/ExperienceRow"
 import { DiaryStats } from "@/features/diary/DiaryStats"
+import { DiaryFilters, EMPTY_FILTERS } from "@/features/diary/DiaryFilters"
+import type { DiaryFilterState } from "@/features/diary/DiaryFilters"
 import { MapPinIcon } from "@/components/ui/icons"
+
+function avgRating(exp: ExperienceEntry): number {
+  if (exp.people.length === 0) return 0
+  return exp.people.reduce((s, p) => s + p.rating, 0) / exp.people.length
+}
 
 /**
  * El Diario: todas nuestras experiencias, de la más nueva a la más vieja.
- * Es el "ver a dónde fuimos".
+ * Es el "ver a dónde fuimos". Con filtros por barrio, tag y puntuación.
  */
 export function DiaryView({ onGoToMap }: { onGoToMap?: () => void }) {
   const { user } = useAuth()
   const { profiles } = useProfiles(user?.id)
   const { experiences, loading, error, reload } = useExperiences()
+  const [filters, setFilters] = useState<DiaryFilterState>(EMPTY_FILTERS)
+
+  const barrios = useMemo(
+    () =>
+      [...new Set(experiences.map((e) => e.restaurant.neighborhood).filter(Boolean))].sort() as string[],
+    [experiences],
+  )
+  const tags = useMemo(
+    () => [...new Set(experiences.flatMap((e) => e.restaurant.tags))].sort(),
+    [experiences],
+  )
+
+  const filtered = useMemo(
+    () =>
+      experiences.filter((e) => {
+        if (filters.barrio && e.restaurant.neighborhood !== filters.barrio) return false
+        if (filters.tag && !e.restaurant.tags.includes(filters.tag)) return false
+        if (filters.minRating > 0 && avgRating(e) < filters.minRating) return false
+        return true
+      }),
+    [experiences, filters],
+  )
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-28 pt-6">
@@ -25,8 +56,8 @@ export function DiaryView({ onGoToMap }: { onGoToMap?: () => void }) {
         </h1>
         {!loading && experiences.length > 0 && (
           <p className="mt-2 text-sm text-muted">
-            {experiences.length} {experiences.length === 1 ? "experiencia" : "experiencias"},
-            de la más nueva a la más vieja.
+            {filtered.length} de {experiences.length}{" "}
+            {experiences.length === 1 ? "experiencia" : "experiencias"}.
           </p>
         )}
       </header>
@@ -43,18 +74,27 @@ export function DiaryView({ onGoToMap }: { onGoToMap?: () => void }) {
 
       {!loading && experiences.length > 0 && (
         <>
-          <DiaryStats experiences={experiences} />
-          <div className="flex flex-col gap-4">
-            {experiences.map((exp) => (
-              <ExperienceRow
-                key={exp.id}
-                experience={exp}
-                profiles={profiles}
-                currentUserId={user?.id}
-                onChanged={reload}
-              />
-            ))}
-          </div>
+          <DiaryFilters barrios={barrios} tags={tags} value={filters} onChange={setFilters} />
+          {filtered.length > 0 ? (
+            <>
+              <DiaryStats experiences={filtered} />
+              <div className="flex flex-col gap-4">
+                {filtered.map((exp) => (
+                  <ExperienceRow
+                    key={exp.id}
+                    experience={exp}
+                    profiles={profiles}
+                    currentUserId={user?.id}
+                    onChanged={reload}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="rounded-2xl border border-dashed border-border bg-surface-2/50 px-6 py-10 text-center text-sm text-muted">
+              No hay experiencias con esos filtros.
+            </p>
+          )}
         </>
       )}
     </div>

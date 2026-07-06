@@ -44,12 +44,14 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 - [x] **Borrar experiencia** (con confirmación) desde el Diario y el detalle. Los dos pueden
       borrar (migración `0004_experiences_shared_delete.sql`).
 - [ ] **Borrar un lugar** (restaurante) entero.
-- [ ] **Tags** por restaurante (parrilla, pizza, café…) con UI de chips.
+- [x] **Tags** por restaurante (parrilla, bodegón, pizza…) con UI de chips: se cargan en el
+      alta de lugar nuevo y se editan desde el detalle del pin. `restaurants.tags` (ya existía).
 - [x] **Medias estrellas** en la carga (input 1–5 con medias, ej. 4.5; mín. 1 por el CHECK).
 
 ## 🔍 Explorar
 
-- [ ] **Filtros**: por barrio, tag, puntuación.
+- [x] **Filtros**: en el Diario, por barrio, tag y puntuación mínima (las stats y la lista se
+      recalculan con el filtro).
 - [x] **Estadísticas / resumen**: resumen arriba del Diario (lugares, visitas, barrio top,
       promedio de cada uno, mejor puntuado). Falta "mejor del mes" y cortes por período.
 
@@ -64,15 +66,16 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 
 - [ ] **Motor propio**: sugerir desde nuestra data por zona (lo mejor puntuado).
 - [ ] **Descubrimiento con Places**: lugares nuevos cerca, con rating real de Google.
-- [ ] **Bodegones por barrio** (idea de Caro): que la app diga qué bodegones tenemos/hay en
-      cada barrio. Requiere **tags** (marcar "bodegón") + agrupar por barrio (data propia), y
-      a futuro descubrir nuevos con Places por barrio. CABA = 48 barrios / 15 comunas.
+- [~] **Bodegones por barrio** (idea de Caro): la **data propia** ya está — en el mapa de
+      barrios elegís el tag "Bodegón" y ves en qué barrios tenemos (y en cuáles no, en ámbar).
+      **Falta** la parte de **descubrir nuevos** con Places por barrio (lo de abajo).
 - [x] **Mapa coloreado por barrio** (idea de Caro): toggle "Barrios" en el mapa → pinta los
       48 barrios de CABA (choropleth verde agua) según cuántos lugares visitamos en cada uno,
       con leyenda y tocar un barrio muestra su nombre + cantidad. GeoJSON oficial simplificado
       en `public/caba-barrios.geojson` (se carga solo al activar). Conteo por punto-en-polígono
-      (lat/lng), no por texto. **Falta:** vista por **comuna** y cruzar con **tag "bodegón"**
-      (hoy cuenta todos los lugares, no solo bodegones — necesita tags).
+      (lat/lng), no por texto. Colores: **ámbar donde no fuimos**, verde donde sí (más intenso =
+      más lugares). **Filtro por tag** en la capa (ej. "Sólo: Bodegón") → "bodegones por barrio".
+      **Falta:** vista por **comuna** (15) como alternativa a barrios (48).
 
 ## 🎨 Pulido y marca
 

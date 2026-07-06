@@ -11,6 +11,7 @@ export type PersonEntry = {
 export type NewExperienceInput = {
   name: string
   neighborhood: string | null
+  tags: string[]
   lat: number
   lng: number
   visitedOn: string // YYYY-MM-DD

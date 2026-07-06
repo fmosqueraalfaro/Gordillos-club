@@ -28,6 +28,7 @@ export type ExperienceEntry = {
     id: string
     name: string
     neighborhood: string | null
+    tags: string[]
     lat: number
     lng: number
   }
@@ -37,7 +38,7 @@ export type ExperienceEntry = {
 
 const SELECT = `
   id, visited_on, starter, price, note, created_at,
-  restaurant:restaurants!inner ( id, name, neighborhood, lat, lng ),
+  restaurant:restaurants!inner ( id, name, neighborhood, tags, lat, lng ),
   people:experience_ratings ( rating, user_id, main, dessert, user:profiles ( id, display_name ) ),
   photos ( id, storage_path, caption )
 `
@@ -55,6 +56,7 @@ function mapRow(row: any): ExperienceEntry {
       id: row.restaurant.id,
       name: row.restaurant.name,
       neighborhood: row.restaurant.neighborhood,
+      tags: row.restaurant.tags ?? [],
       lat: row.restaurant.lat,
       lng: row.restaurant.lng,
     },
