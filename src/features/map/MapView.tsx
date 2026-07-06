@@ -3,6 +3,8 @@ import { APIProvider, Map, Marker, useMap } from "@vis.gl/react-google-maps"
 import { useRestaurants } from "@/features/restaurants/useRestaurants"
 import { AddExperienceSheet } from "@/features/experiences/AddExperienceSheet"
 import { RestaurantDetailSheet } from "@/features/restaurants/RestaurantDetailSheet"
+import { PlaceSearch } from "@/features/map/PlaceSearch"
+import type { PickedPlace } from "@/features/map/PlaceSearch"
 import type { DraftLocation } from "@/features/experiences/types"
 import type { Restaurant } from "@/features/restaurants/types"
 import { MapPinIcon, PlusIcon, LocateIcon } from "@/components/ui/icons"
@@ -19,7 +21,20 @@ function MapInner() {
   const { restaurants, reload } = useRestaurants()
   const [placing, setPlacing] = useState(false)
   const [draft, setDraft] = useState<DraftLocation | null>(null)
+  const [prefill, setPrefill] = useState<{ name?: string; neighborhood?: string } | undefined>()
   const [selected, setSelected] = useState<Restaurant | null>(null)
+
+  function closeDraft() {
+    setDraft(null)
+    setPrefill(undefined)
+  }
+
+  function pickFromSearch(place: PickedPlace) {
+    setPlacing(false)
+    setSelected(null)
+    setDraft({ lat: place.lat, lng: place.lng })
+    setPrefill({ name: place.name, neighborhood: place.neighborhood ?? undefined })
+  }
 
   return (
     <div className="relative h-full w-full">
@@ -54,6 +69,9 @@ function MapInner() {
 
         <MyLocation />
 
+        {/* Buscador de lugares (Places). Se oculta al elegir un punto en el mapa. */}
+        {!placing && !draft && !selected && <PlaceSearch onPick={pickFromSearch} />}
+
         {/* Banner de "elegí el punto" */}
         {placing && (
           <div className="absolute inset-x-0 top-4 z-10 mx-auto flex w-fit items-center gap-3 rounded-full border border-border bg-surface/95 px-4 py-2 text-sm text-ink shadow-lg backdrop-blur">
@@ -84,9 +102,10 @@ function MapInner() {
         {draft && (
           <AddExperienceSheet
             location={draft}
-            onClose={() => setDraft(null)}
+            prefill={prefill}
+            onClose={closeDraft}
             onSaved={() => {
-              setDraft(null)
+              closeDraft()
               reload()
             }}
           />

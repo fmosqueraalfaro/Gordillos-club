@@ -23,9 +23,15 @@ NUNCA haya un cobro, aunque haya un bug o alguien robe la key.
 
 ### 2. Habilitar solo las APIs necesarias
 - Maps JavaScript API
-- Places API
+- **Places API (New)** ← necesaria para el buscador de restaurantes (autocomplete). Es la
+  versión nueva; buscar en la biblioteca de APIs *"Places API (New)"* y habilitarla. Sin
+  esto, el buscador del mapa muestra un aviso y no trae resultados (el resto de la app anda).
 - Geocoding API (si se usa)
 - ❌ No habilitar nada más (menos superficie = menos riesgo).
+
+> **Costo del buscador:** usamos *session tokens*, así que una búsqueda entera (varias teclas
+> + elegir el lugar) se cobra como un solo evento. Con el tope diario del punto 3 y el uso de
+> dos personas, queda dentro del free tier.
 
 ### 3. 🔒 Topes de cuota diarios (LA red más importante)
 En *APIs & Services → cada API → Quotas*, poner un límite diario bajo. Ejemplo:

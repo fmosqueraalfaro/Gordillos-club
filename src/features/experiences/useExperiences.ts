@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
+import { photoPublicUrl } from "@/features/experiences/photos"
 
 export type ExperienceRating = {
   rating: number
   userId: string
   name: string
+}
+
+export type ExperiencePhoto = {
+  id: string
+  url: string
+  caption: string | null
 }
 
 export type ExperienceEntry = {
@@ -21,12 +28,14 @@ export type ExperienceEntry = {
     lng: number
   }
   ratings: ExperienceRating[]
+  photos: ExperiencePhoto[]
 }
 
 const SELECT = `
   id, visited_on, dish, note, created_at,
   restaurant:restaurants!inner ( id, name, neighborhood, lat, lng ),
-  ratings:experience_ratings ( rating, user_id, user:profiles ( id, display_name ) )
+  ratings:experience_ratings ( rating, user_id, user:profiles ( id, display_name ) ),
+  photos ( id, storage_path, caption )
 `
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -48,6 +57,11 @@ function mapRow(row: any): ExperienceEntry {
       rating: Number(r.rating),
       userId: r.user_id,
       name: r.user?.display_name ?? "Alguien",
+    })),
+    photos: (row.photos ?? []).map((p: any) => ({
+      id: p.id,
+      url: photoPublicUrl(p.storage_path),
+      caption: p.caption ?? null,
     })),
   }
 }

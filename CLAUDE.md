@@ -95,7 +95,7 @@ su nota → la doble puntuación vive en cada experiencia. Ver `docs/modelo-dato
 
 ## 5. Estado del proyecto
 
-- **Fase actual:** 🏗️ Fase 2 — Núcleo funcional (en curso).
+- **Fase actual:** 🏗️ Fase 2 — Núcleo funcional (Entrega 2 completa).
 - **En vivo:** 🌐 https://gordillos-club-swart.vercel.app/ · Repo:
   https://github.com/fmosqueraalfaro/Gordillos-club (`main`, auto-deploy en cada push).
 - **Hecho:** documentación; scaffold; Supabase (esquema 0001+0002 verificado); auth + layout;
@@ -104,10 +104,14 @@ su nota → la doble puntuación vive en cada experiencia. Ver `docs/modelo-dato
   nombre/barrio/fecha/plato/nota/estrellas → pin); **Diario (timeline)**; **navegación
   Mapa/Diario**; **detalle del lugar al tocar el pin** (historial + promedio); **GPS**
   (centrado al abrir + botón "mi ubicación"); **sumar visita a un lugar existente** (desde
-  el detalle del pin, sin duplicar). Deploy en Vercel funcionando en el celular.
-- **Próximo paso:** Entrega 2 (resto) — 📸 **fotos** por experiencia + 🔎 **Places search**.
-  Ver `docs/pendientes.md`.
-- Ver último detalle en `worklog/2026-07/2026-07-06-sumar-visita-existente.md`.
+  el detalle del pin, sin duplicar); 📸 **fotos por experiencia** (uploader → Storage → se
+  ven en Diario/detalle); 🔎 **búsqueda con Places** (autocomplete + session tokens, prellena
+  el alta). Deploy en Vercel funcionando en el celular. **Entrega 2 completa.**
+- **Pendiente de config (usuario):** habilitar **"Places API (New)"** en Google Cloud para que
+  ande el buscador (ver `docs/setup-google-maps.md`).
+- **Próximo paso:** Fase 3 — recomendaciones (motor propio + descubrimiento Places), y pulido
+  (filtros, editar/borrar, tags, medias estrellas, PWA). Ver `docs/pendientes.md`.
+- Ver último detalle en `worklog/2026-07/2026-07-06-fotos-y-places.md`.
 
 ---
 

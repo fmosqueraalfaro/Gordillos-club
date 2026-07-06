@@ -3,13 +3,14 @@
 Lista viva de lo que falta, ordenada por prioridad. El plan por fases está en `roadmap.md`;
 esto es la vista práctica de "qué sigue".
 
-Última actualización: 2026-07-06 (tarde).
+Última actualización: 2026-07-06 (noche).
 
 ---
 
-## 🎯 Entrega 2 — el Diario y el uso en el celular (lo próximo)
+## ✅ Entrega 2 — el Diario y el uso en el celular (COMPLETA)
 
-Lo más importante para que la app se sienta completa y cómoda en mobile:
+Lo más importante para que la app se sienta completa y cómoda en mobile. Todo hecho; solo
+falta que habilites **"Places API (New)"** en Google Cloud para que ande el buscador.
 
 - [x] **Diario (timeline)**: ver todas las experiencias, lo más nuevo arriba, en tarjetas
       con la doble puntuación, el plato y la nota. Es el "ver nuestras experiencias".
@@ -18,13 +19,14 @@ Lo más importante para que la app se sienta completa y cómoda en mobile:
 - [x] **Elegir un lugar YA existente** al agregar (para sumar otra visita sin duplicar el
       pin). Resuelto vía el detalle del pin → botón "Sumar visita acá" (modo existente del
       alta, sin volver a pedir nombre/barrio/ubicación).
-- [ ] 📸 **Subir fotos por experiencia** (el bucket `photos` y la tabla ya están listos en
-      Supabase; falta el uploader + mostrarlas en la tarjeta/detalle).
+- [x] 📸 **Subir fotos por experiencia** — uploader (multi-foto, con preview) en el alta →
+      Supabase Storage (bucket `photos`) → se muestran en la tarjeta del Diario y en el detalle.
 - [x] 📍 **Centrar el mapa en tu ubicación (GPS)** al abrir — gratis (geolocalización del
       navegador) + botón "mi ubicación" para recentrar. Si no hay permiso, queda en Buenos Aires.
-- [ ] 🔎 **Buscar el lugar con Places autocomplete** — escribís el nombre y lo elegís (trae
-      ubicación y barrio solos). Requiere habilitar **"Places API (New)"** en Google Cloud.
-      Con session tokens el costo es mínimo.
+- [x] 🔎 **Buscar el lugar con Places autocomplete** — escribís el nombre y lo elegís (trae
+      ubicación y barrio solos, prellena el alta). Con session tokens el costo es mínimo.
+      ⚠️ **Requiere habilitar "Places API (New)" en Google Cloud** para que funcione (ver
+      `docs/setup-google-maps.md`); hasta entonces el buscador muestra un aviso.
 
 ## 🧭 Navegación
 

@@ -15,7 +15,7 @@ export function ExperienceCard({
   experience: ExperienceEntry
   showPlace?: boolean
 }) {
-  const { restaurant, visitedOn, dish, note, ratings } = experience
+  const { restaurant, visitedOn, dish, note, ratings, photos } = experience
   const scores = ratings.map((r) => ({ name: r.name, score: r.rating }))
   const date = formatVisitedOn(visitedOn)
 
@@ -45,6 +45,20 @@ export function ExperienceCard({
       )}
 
       {note && <p className="mt-3 text-sm leading-relaxed text-muted">“{note}”</p>}
+
+      {photos.length > 0 && (
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          {photos.map((photo) => (
+            <img
+              key={photo.id}
+              src={photo.url}
+              alt={photo.caption ?? `Foto de ${restaurant.name}`}
+              loading="lazy"
+              className="h-24 w-24 shrink-0 rounded-xl border border-border object-cover"
+            />
+          ))}
+        </div>
+      )}
 
       <div className="mt-4 border-t border-border pt-3">
         <RatingStrip scores={scores} />
