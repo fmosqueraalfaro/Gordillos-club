@@ -7,32 +7,20 @@ import { Contours } from "@/components/brand/Contours"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 
 export function AuthPage() {
-  const { signIn, signUp } = useAuth()
-  const [mode, setMode] = useState<"login" | "register">("login")
-  const [displayName, setDisplayName] = useState("")
+  const { signIn } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
-  const [info, setInfo] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  const isRegister = mode === "register"
-
+  // El registro está cerrado a propósito: Gordillos Club es de dos. Los nuevos
+  // registros se bloquean también en Supabase (Auth → "Allow new users to sign up").
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
-    setInfo(null)
     setBusy(true)
     try {
-      if (isRegister) {
-        const { needsConfirmation } = await signUp(email, password, displayName)
-        if (needsConfirmation) {
-          setInfo("Listo. Te mandamos un mail para confirmar la cuenta; después iniciá sesión.")
-          setMode("login")
-        }
-      } else {
-        await signIn(email, password)
-      }
+      await signIn(email, password)
     } catch (err) {
       setError(err instanceof Error ? err.message : "No pudimos completar la acción. Probá de nuevo.")
     } finally {
@@ -66,19 +54,6 @@ export function AuthPage() {
           onSubmit={handleSubmit}
           className="flex flex-col gap-3 rounded-2xl border border-border bg-surface/80 p-6 shadow-sm backdrop-blur"
         >
-          {isRegister && (
-            <Field label="Nombre">
-              <Input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Cómo querés que te muestre"
-                required
-                autoComplete="name"
-              />
-            </Field>
-          )}
-
           <Field label="Email">
             <Input
               type="email"
@@ -98,7 +73,7 @@ export function AuthPage() {
               placeholder="••••••••"
               required
               minLength={6}
-              autoComplete={isRegister ? "new-password" : "current-password"}
+              autoComplete="current-password"
             />
           </Field>
 
@@ -107,30 +82,14 @@ export function AuthPage() {
               {error}
             </p>
           )}
-          {info && (
-            <p className="rounded-lg bg-aqua/10 px-3 py-2 text-sm text-aqua-ink dark:text-aqua">
-              {info}
-            </p>
-          )}
 
           <Button type="submit" disabled={busy} className="mt-1">
-            {busy ? "Un momento…" : isRegister ? "Crear cuenta" : "Entrar"}
+            {busy ? "Un momento…" : "Entrar"}
           </Button>
         </form>
 
-        <p className="mt-5 text-center text-sm text-muted">
-          {isRegister ? "¿Ya tenés cuenta?" : "¿Primera vez?"}{" "}
-          <button
-            type="button"
-            onClick={() => {
-              setMode(isRegister ? "login" : "register")
-              setError(null)
-              setInfo(null)
-            }}
-            className="font-semibold text-ink underline decoration-aqua decoration-2 underline-offset-4 hover:text-aqua"
-          >
-            {isRegister ? "Iniciá sesión" : "Creá una cuenta"}
-          </button>
+        <p className="mt-5 text-center text-xs text-muted">
+          Club privado de dos. El registro está cerrado.
         </p>
       </div>
     </main>

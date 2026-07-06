@@ -111,11 +111,15 @@ su nota → la doble puntuación vive en cada experiencia. Ver `docs/modelo-dato
   van a comer juntos); el detalle del lugar muestra **la nota de cada uno** (no promedio) y
   permite **editar** las notas. RLS compartida → migración `0003_ratings_shared.sql`.
   "Grupos de comida" quedó diferido a la fase de escalado (ADR-010).
+- **PWA instalable** (vite-plugin-pwa, ícono de marca, service worker auto-update);
+  **medias estrellas** en la carga; **estadísticas** en el Diario (lugares/visitas/barrio
+  top/promedio de cada uno/mejor puntuado); **registro cerrado** en el login (club de dos).
 - **Pendiente de config (usuario):** (1) correr `0003_ratings_shared.sql` en Supabase;
-  (2) "Places API (New)" ya habilitada ✅.
+  (2) cerrar registros en Supabase (Auth → "Allow new users to sign up" → OFF);
+  (3) verificar topes de cuota/alerta de Google; (4) "Places API (New)" ya habilitada ✅.
 - **Próximo paso:** Fase 3 — recomendaciones (motor propio + descubrimiento Places), y pulido
-  (filtros, editar/borrar resto, tags, medias estrellas, PWA). Ver `docs/pendientes.md`.
-- Ver último detalle en `worklog/2026-07/2026-07-06-doble-puntuacion.md`.
+  (filtros, editar/borrar resto, tags, pins de marca). Ver `docs/pendientes.md`.
+- Ver último detalle en `worklog/2026-07/2026-07-06-pwa-medias-stats.md`.
 
 ---
 

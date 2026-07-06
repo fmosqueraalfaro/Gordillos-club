@@ -42,14 +42,13 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 - [x] **Editar puntuaciones** desde el detalle del lugar (cualquiera edita las notas).
 - [ ] **Editar/borrar** el resto de la experiencia (fecha, plato, nota, fotos) / un lugar.
 - [ ] **Tags** por restaurante (parrilla, pizza, café…) con UI de chips.
-- [ ] **Medias estrellas** en la carga (la base ya admite 4.5; hoy el input es de 1 a 5
-      enteros).
+- [x] **Medias estrellas** en la carga (input 1–5 con medias, ej. 4.5; mín. 1 por el CHECK).
 
 ## 🔍 Explorar
 
 - [ ] **Filtros**: por barrio, tag, puntuación.
-- [ ] **Estadísticas / resumen**: cuántos lugares, barrio favorito, promedio, "mejor del
-      mes", etc.
+- [x] **Estadísticas / resumen**: resumen arriba del Diario (lugares, visitas, barrio top,
+      promedio de cada uno, mejor puntuado). Falta "mejor del mes" y cortes por período.
 
 ## 👥 Grupos de comida (Fase escalado — ver ADR-010)
 
@@ -72,8 +71,9 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 
 ## 📱 Infraestructura
 
-- [ ] **PWA**: instalable en el celular ("Agregar a pantalla de inicio") + ícono propio
-      (`vite-plugin-pwa`).
+- [x] **PWA**: instalable en el celular ("Agregar a pantalla de inicio") + ícono de marca
+      (tenedor/cuchillo en verde agua) + service worker con auto-update (`vite-plugin-pwa`).
+      Íconos generados con `@vite-pwa/assets-generator` desde `public/logo.svg`.
 - [ ] (Opcional) **Dominio propio** en Vercel en vez de `*.vercel.app`.
 - [ ] (Opcional) **shadcn/ui** completo si queremos más componentes.
 
@@ -83,6 +83,13 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 
 - **Correr en Supabase la migración `0003_ratings_shared.sql`** (SQL Editor → Run). Sin ella,
   guardar la nota del otro falla por RLS (cada uno solo podría escribir la suya).
+- **Cerrar el registro en Supabase**: Auth → "Allow new users to sign up" → OFF (candado B).
+  El frontend ya esconde el "Creá una cuenta", pero el bloqueo real es este toggle. Así nadie
+  nuevo puede registrarse ni disparar la API. Confirmar también que solo esté el proveedor
+  Email (sin logins sociales).
+- **Blindaje de costo (Google)**: verificar topes de cuota diarios + alerta de presupuesto
+  US$1 + restricción de key por dominio (ver `setup-google-maps.md`). Es lo que garantiza
+  cero cobro pase lo que pase.
 
 - El "Agregar" del mapa siempre crea un lugar nuevo; para sumar a uno existente se entra por
   el pin → "Sumar visita acá". (No hay merge de duplicados si ya se crearon dos pins iguales.)

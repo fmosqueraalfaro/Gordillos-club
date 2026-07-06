@@ -1,5 +1,6 @@
 import { useExperiences } from "@/features/experiences/useExperiences"
 import { ExperienceCard } from "@/features/experiences/ExperienceCard"
+import { DiaryStats } from "@/features/diary/DiaryStats"
 import { MapPinIcon } from "@/components/ui/icons"
 
 /**
@@ -37,11 +38,14 @@ export function DiaryView({ onGoToMap }: { onGoToMap?: () => void }) {
       {!loading && !error && experiences.length === 0 && <EmptyDiary onGoToMap={onGoToMap} />}
 
       {!loading && experiences.length > 0 && (
-        <div className="flex flex-col gap-4">
-          {experiences.map((exp) => (
-            <ExperienceCard key={exp.id} experience={exp} />
-          ))}
-        </div>
+        <>
+          <DiaryStats experiences={experiences} />
+          <div className="flex flex-col gap-4">
+            {experiences.map((exp) => (
+              <ExperienceCard key={exp.id} experience={exp} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   )
