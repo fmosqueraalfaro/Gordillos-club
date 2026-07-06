@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* Paleta de Restaurant Judge: pastel con tintes verdes y verde agua.
+   Tailwind v4: los tokens se definen con @theme y se usan como clases (bg-brand, text-aqua, etc.). */
+@theme {
+  --color-brand: #2dd4bf;        /* verde agua principal (teal pastel) */
+  --color-brand-ink: #0f766e;    /* verde profundo para texto sobre pastel */
+  --color-aqua: #99f6e4;         /* verde agua claro, para fondos suaves */
+  --color-mint: #d1fae5;         /* menta muy pastel */
+  --color-sage: #a7f3d0;         /* verde salvia pastel */
+  --font-sans: system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Fondo pastel con un lavado de verde agua */
+  background: linear-gradient(160deg, #f0fdfa 0%, #ecfdf5 100%);
+  color: #134e4a;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(160deg, #0c1512 0%, #0f1917 100%);
+    color: #d1fae5;
+  }
+}
