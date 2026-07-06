@@ -1,9 +1,11 @@
-import { useState } from "react"
-import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { APIProvider, Map, Marker, useMap } from "@vis.gl/react-google-maps"
 import { useRestaurants } from "@/features/restaurants/useRestaurants"
 import { AddExperienceSheet } from "@/features/experiences/AddExperienceSheet"
+import { RestaurantDetailSheet } from "@/features/restaurants/RestaurantDetailSheet"
 import type { DraftLocation } from "@/features/experiences/types"
-import { MapPinIcon, PlusIcon } from "@/components/ui/icons"
+import type { Restaurant } from "@/features/restaurants/types"
+import { MapPinIcon, PlusIcon, LocateIcon } from "@/components/ui/icons"
 
 const KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const BUENOS_AIRES = { lat: -34.6037, lng: -58.3816 }
@@ -17,6 +19,7 @@ function MapInner() {
   const { restaurants, reload } = useRestaurants()
   const [placing, setPlacing] = useState(false)
   const [draft, setDraft] = useState<DraftLocation | null>(null)
+  const [selected, setSelected] = useState<Restaurant | null>(null)
 
   return (
     <div className="relative h-full w-full">
@@ -36,10 +39,20 @@ function MapInner() {
           }}
         >
           {restaurants.map((r) => (
-            <Marker key={r.id} position={{ lat: r.lat, lng: r.lng }} title={r.name} />
+            <Marker
+              key={r.id}
+              position={{ lat: r.lat, lng: r.lng }}
+              title={r.name}
+              onClick={() => {
+                if (placing) return
+                setSelected(r)
+              }}
+            />
           ))}
           {draft && <Marker position={draft} />}
         </Map>
+
+        <MyLocation />
 
         {/* Banner de "elegí el punto" */}
         {placing && (
@@ -56,12 +69,12 @@ function MapInner() {
           </div>
         )}
 
-        {/* Botón flotante para agregar */}
+        {/* Botón flotante para agregar (por encima de la barra de navegación) */}
         {!placing && !draft && (
           <button
             type="button"
             onClick={() => setPlacing(true)}
-            className="absolute bottom-6 right-6 z-10 inline-flex items-center gap-2 rounded-full bg-aqua px-5 py-3 font-semibold text-aqua-ink shadow-lg transition hover:brightness-105 active:brightness-95"
+            className="absolute bottom-20 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-aqua px-5 py-3 font-semibold text-aqua-ink shadow-lg transition hover:brightness-105 active:brightness-95"
           >
             <PlusIcon className="size-5" />
             Agregar
@@ -78,8 +91,60 @@ function MapInner() {
             }}
           />
         )}
+
+        {selected && (
+          <RestaurantDetailSheet
+            restaurant={selected}
+            onClose={() => setSelected(null)}
+          />
+        )}
       </APIProvider>
     </div>
+  )
+}
+
+/**
+ * Centra el mapa en tu ubicación al abrir (una sola vez) y ofrece un botón
+ * para volver a centrar. Gratis: geolocalización del navegador (requiere HTTPS
+ * o localhost). Si el usuario no da permiso, el mapa se queda en Buenos Aires.
+ */
+function MyLocation() {
+  const map = useMap()
+  const didInit = useRef(false)
+
+  const locate = useCallback(
+    (zoom: number) => {
+      if (!map || !("geolocation" in navigator)) return
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          map.panTo({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+          map.setZoom(zoom)
+        },
+        () => {
+          /* permiso denegado o sin señal: se queda donde estaba */
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 },
+      )
+    },
+    [map],
+  )
+
+  // Centrado inicial, una sola vez, cuando el mapa está listo.
+  useEffect(() => {
+    if (!map || didInit.current) return
+    didInit.current = true
+    locate(15)
+  }, [map, locate])
+
+  return (
+    <button
+      type="button"
+      onClick={() => locate(16)}
+      aria-label="Centrar en mi ubicación"
+      className="absolute bottom-20 left-5 z-20 grid size-11 place-items-center rounded-full border border-border bg-surface/95 text-ink shadow-lg backdrop-blur transition hover:text-aqua active:brightness-95"
+    >
+      <LocateIcon className="size-5" />
+    </button>
   )
 }
 
