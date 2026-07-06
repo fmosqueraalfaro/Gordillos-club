@@ -1,20 +1,26 @@
+import { useState } from "react"
 import { useExperiences } from "@/features/experiences/useExperiences"
 import { ExperienceCard } from "@/features/experiences/ExperienceCard"
-import { MapPinIcon, StarIcon } from "@/components/ui/icons"
+import { AddExperienceSheet } from "@/features/experiences/AddExperienceSheet"
+import { MapPinIcon, StarIcon, PlusIcon } from "@/components/ui/icons"
 import type { Restaurant } from "@/features/restaurants/types"
 
 /**
  * Detalle de un lugar al tocar su pin: promedio, cantidad de visitas y el
- * historial de experiencias ahí (con la nota de cada uno).
+ * historial de experiencias ahí (con la nota de cada uno). Permite además
+ * sumar otra visita al mismo lugar (sin duplicar el pin).
  */
 export function RestaurantDetailSheet({
   restaurant,
   onClose,
+  onChanged,
 }: {
   restaurant: Restaurant
   onClose: () => void
+  onChanged?: () => void
 }) {
-  const { experiences, loading, error } = useExperiences(restaurant.id)
+  const { experiences, loading, error, reload } = useExperiences(restaurant.id)
+  const [adding, setAdding] = useState(false)
 
   const allRatings = experiences.flatMap((e) => e.ratings.map((r) => r.rating))
   const avg =
@@ -24,6 +30,7 @@ export function RestaurantDetailSheet({
   const visits = experiences.length
 
   return (
+    <>
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-6"
       onClick={onClose}
@@ -70,6 +77,15 @@ export function RestaurantDetailSheet({
           </span>
         </div>
 
+        <button
+          type="button"
+          onClick={() => setAdding(true)}
+          className="mb-5 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-aqua/40 bg-aqua/10 px-4 py-2.5 text-sm font-semibold text-aqua transition hover:bg-aqua/15 active:brightness-95"
+        >
+          <PlusIcon className="size-4" />
+          Sumar visita acá
+        </button>
+
         {loading && (
           <div className="flex flex-col gap-4">
             {[0, 1].map((i) => (
@@ -105,5 +121,19 @@ export function RestaurantDetailSheet({
         )}
       </div>
     </div>
+
+    {adding && (
+      <AddExperienceSheet
+        mode="existing"
+        restaurant={restaurant}
+        onClose={() => setAdding(false)}
+        onSaved={() => {
+          setAdding(false)
+          reload()
+          onChanged?.()
+        }}
+      />
+    )}
+    </>
   )
 }

@@ -96,6 +96,7 @@ function MapInner() {
           <RestaurantDetailSheet
             restaurant={selected}
             onClose={() => setSelected(null)}
+            onChanged={reload}
           />
         )}
       </APIProvider>

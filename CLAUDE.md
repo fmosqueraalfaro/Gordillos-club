@@ -103,10 +103,11 @@ su nota → la doble puntuación vive en cada experiencia. Ver `docs/modelo-dato
   nombre Gordillos Club; **mapa Google Maps**; **alta de experiencia** (tocar el mapa →
   nombre/barrio/fecha/plato/nota/estrellas → pin); **Diario (timeline)**; **navegación
   Mapa/Diario**; **detalle del lugar al tocar el pin** (historial + promedio); **GPS**
-  (centrado al abrir + botón "mi ubicación"). Deploy en Vercel funcionando en el celular.
-- **Próximo paso:** Entrega 2 (resto) — **elegir lugar existente** al agregar + 📸 **fotos** +
-  🔎 **Places search**. Ver `docs/pendientes.md`.
-- Ver último detalle en `worklog/2026-07/2026-07-06-diario-nav-detalle-gps.md`.
+  (centrado al abrir + botón "mi ubicación"); **sumar visita a un lugar existente** (desde
+  el detalle del pin, sin duplicar). Deploy en Vercel funcionando en el celular.
+- **Próximo paso:** Entrega 2 (resto) — 📸 **fotos** por experiencia + 🔎 **Places search**.
+  Ver `docs/pendientes.md`.
+- Ver último detalle en `worklog/2026-07/2026-07-06-sumar-visita-existente.md`.
 
 ---
 

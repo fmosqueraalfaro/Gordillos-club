@@ -15,8 +15,9 @@ Lo más importante para que la app se sienta completa y cómoda en mobile:
       con la doble puntuación, el plato y la nota. Es el "ver nuestras experiencias".
 - [x] **Tocar un pin** → panel de detalle del lugar: sus visitas (historial), promedio y
       las notas de cada uno.
-- [ ] **Elegir un lugar YA existente** al agregar (para sumar otra visita sin duplicar el
-      pin). Hoy cada alta crea un lugar nuevo.
+- [x] **Elegir un lugar YA existente** al agregar (para sumar otra visita sin duplicar el
+      pin). Resuelto vía el detalle del pin → botón "Sumar visita acá" (modo existente del
+      alta, sin volver a pedir nombre/barrio/ubicación).
 - [ ] 📸 **Subir fotos por experiencia** (el bucket `photos` y la tabla ya están listos en
       Supabase; falta el uploader + mostrarlas en la tarjeta/detalle).
 - [x] 📍 **Centrar el mapa en tu ubicación (GPS)** al abrir — gratis (geolocalización del
@@ -68,7 +69,8 @@ Lo más importante para que la app se sienta completa y cómoda en mobile:
 
 ## ⚠️ Deuda técnica / cosas a tener en cuenta
 
-- Cada alta crea un lugar nuevo (falta el "elegir existente" — arriba).
+- El "Agregar" del mapa siempre crea un lugar nuevo; para sumar a uno existente se entra por
+  el pin → "Sumar visita acá". (No hay merge de duplicados si ya se crearon dos pins iguales.)
 - El barrio se carga a mano (sin reverse geocoding).
 - El input de estrellas es de enteros (la DB admite medias).
 - Si algún día cambia el dominio de Vercel, hay que **agregarlo a las restricciones de la
