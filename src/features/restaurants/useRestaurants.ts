@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import type { Restaurant } from "@/features/restaurants/types"
 
@@ -10,22 +10,22 @@ export function useRestaurants() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    let active = true
+  const reload = useCallback(() => {
+    setLoading(true)
     supabase
       .from("restaurants")
       .select(COLUMNS)
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
-        if (!active) return
         if (error) setError(error.message)
         else setRestaurants((data ?? []) as Restaurant[])
         setLoading(false)
       })
-    return () => {
-      active = false
-    }
   }, [])
 
-  return { restaurants, loading, error }
+  useEffect(() => {
+    reload()
+  }, [reload])
+
+  return { restaurants, loading, error, reload }
 }

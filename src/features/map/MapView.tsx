@@ -1,14 +1,22 @@
+import { useState } from "react"
 import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps"
 import { useRestaurants } from "@/features/restaurants/useRestaurants"
-import { MapPinIcon } from "@/components/ui/icons"
+import { AddExperienceSheet } from "@/features/experiences/AddExperienceSheet"
+import type { DraftLocation } from "@/features/experiences/types"
+import { MapPinIcon, PlusIcon } from "@/components/ui/icons"
 
 const KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const BUENOS_AIRES = { lat: -34.6037, lng: -58.3816 }
 
 export function MapView() {
-  if (!KEY) {
-    return <MissingKey />
-  }
+  if (!KEY) return <MissingKey />
+  return <MapInner />
+}
+
+function MapInner() {
+  const { restaurants, reload } = useRestaurants()
+  const [placing, setPlacing] = useState(false)
+  const [draft, setDraft] = useState<DraftLocation | null>(null)
 
   return (
     <div className="relative h-full w-full">
@@ -19,22 +27,59 @@ export function MapView() {
           gestureHandling="greedy"
           disableDefaultUI
           className="h-full w-full"
+          onClick={(ev) => {
+            if (!placing) return
+            const ll = ev.detail.latLng
+            if (!ll) return
+            setDraft({ lat: ll.lat, lng: ll.lng })
+            setPlacing(false)
+          }}
         >
-          <RestaurantMarkers />
+          {restaurants.map((r) => (
+            <Marker key={r.id} position={{ lat: r.lat, lng: r.lng }} title={r.name} />
+          ))}
+          {draft && <Marker position={draft} />}
         </Map>
+
+        {/* Banner de "elegí el punto" */}
+        {placing && (
+          <div className="absolute inset-x-0 top-4 z-10 mx-auto flex w-fit items-center gap-3 rounded-full border border-border bg-surface/95 px-4 py-2 text-sm text-ink shadow-lg backdrop-blur">
+            <MapPinIcon className="size-4 text-aqua" />
+            Tocá el mapa donde estuvieron
+            <button
+              type="button"
+              onClick={() => setPlacing(false)}
+              className="font-medium text-muted hover:text-ink"
+            >
+              Cancelar
+            </button>
+          </div>
+        )}
+
+        {/* Botón flotante para agregar */}
+        {!placing && !draft && (
+          <button
+            type="button"
+            onClick={() => setPlacing(true)}
+            className="absolute bottom-6 right-6 z-10 inline-flex items-center gap-2 rounded-full bg-aqua px-5 py-3 font-semibold text-aqua-ink shadow-lg transition hover:brightness-105 active:brightness-95"
+          >
+            <PlusIcon className="size-5" />
+            Agregar
+          </button>
+        )}
+
+        {draft && (
+          <AddExperienceSheet
+            location={draft}
+            onClose={() => setDraft(null)}
+            onSaved={() => {
+              setDraft(null)
+              reload()
+            }}
+          />
+        )}
       </APIProvider>
     </div>
-  )
-}
-
-function RestaurantMarkers() {
-  const { restaurants } = useRestaurants()
-  return (
-    <>
-      {restaurants.map((r) => (
-        <Marker key={r.id} position={{ lat: r.lat, lng: r.lng }} title={r.name} />
-      ))}
-    </>
   )
 }
 
