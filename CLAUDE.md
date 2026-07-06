@@ -58,12 +58,12 @@ escalado futuro a nivel producto/ventas.
 ### Núcleo (Fase 1 — lo que construimos primero)
 - [ ] Auth con Supabase — **una cuenta por persona** (login individual).
 - [ ] Mapa (Google Maps) mostrando los restaurantes visitados como pins.
-- [ ] Agregar restaurante: nombre, ubicación (pin en el mapa / autocompletado de Places),
-      barrio/zona, tags (pizza, sushi, café…).
-- [ ] Reseña por usuario: puntuación + comentario + fecha. Cada uno deja la suya sobre el
-      mismo lugar → se puede ver "a él 8, a ella 6" y el promedio.
-- [ ] Subir **fotos** de los platos/lugar (Supabase Storage).
-- [ ] Ver historial y filtrar por barrio / tag / puntuación / usuario.
+- [ ] Agregar experiencia: elegir/crear el lugar (Places o click en mapa) + fecha + **plato**
+      + nota + la puntuación 1–5 de cada uno.
+- [ ] **Diario**: timeline de experiencias (lo más nuevo arriba).
+- [ ] Detalle de un lugar: historial de experiencias ahí.
+- [ ] Subir **fotos** por experiencia (Supabase Storage).
+- [ ] Filtrar por barrio / tag / puntuación.
 - [ ] PWA instalable + responsive mobile-first.
 
 ### Recomendaciones (las dos vías — ver `docs/recomendaciones.md`)
@@ -82,14 +82,14 @@ escalado futuro a nivel producto/ventas.
 Detalle completo en `docs/modelo-datos.md`. Idea central:
 
 - `profiles` — usuarios (extiende auth de Supabase).
-- `restaurants` — el **lugar** (único por ubicación): nombre, lat/lng, barrio, tags,
-  `google_place_id` (opcional, para vincular con Places).
-- `reviews` — reseña de **un usuario sobre un restaurant**: puntuación, comentario, fecha.
-  Los dos pueden reseñar el mismo lugar (clave: `restaurant_id` + `user_id`).
-- `photos` — fotos asociadas a una reseña o restaurante (URL en Supabase Storage).
+- `restaurants` — el **lugar** (único por ubicación): pin del mapa. nombre, lat/lng, barrio,
+  tags, `google_place_id`.
+- `experiences` — **una visita** a un lugar: fecha, plato, nota. Un lugar tiene muchas.
+- `experience_ratings` — la estrella de **cada persona** sobre una experiencia (1–5).
+- `photos` — fotos de una experiencia (archivo en Supabase Storage).
 
-Cuentas individuales ⇒ un restaurante es compartido/único, y las puntuaciones son por
-persona. Eso habilita comparar y promediar.
+Modelo **diario**: las experiencias son compartidas (una salida de los dos) y cada uno pone
+su nota → la doble puntuación vive en cada experiencia. Ver `docs/modelo-datos.md`.
 
 ---
 

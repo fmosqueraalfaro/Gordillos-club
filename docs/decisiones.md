@@ -82,3 +82,18 @@ descartamos. Formato liviano tipo ADR (Architecture Decision Record). Orden cron
   "gordos de comer"). El repo/carpeta mantiene el codename `Restaurant-Judge`.
 - **Por qué:** nombre personal y cálido, con aire de "club de dos socios". Elegido entre
   varias opciones (Comité Gordillo, Los Gordillos, Ruta Gordilla).
+
+## ADR-009 — Modelo "experiencias/diario" (no solo lugares)
+- **Fecha:** 2026-07-06
+- **Estado:** Aceptada
+- **Decisión:** la unidad central es la **experiencia** (una visita), no el restaurante.
+  Jerarquía: `restaurants` (pin del mapa) 1─N `experiences` (visita: fecha, plato, nota,
+  fotos) 1─N `experience_ratings` (la estrella de cada persona). Las experiencias son
+  **compartidas** (una salida de los dos) y cada uno pone su nota. Se registra el **plato**.
+  Reemplaza la tabla `reviews` de 0001 (migración `0002_experiences.sql`).
+- **Por qué:** el usuario quería "ver sus experiencias" y pensar en comidas, no en lugares
+  estáticos. Un diario está hecho de eventos, soporta volver al mismo lugar, y es más
+  emotivo. La doble puntuación (firma) pasa a vivir en cada experiencia.
+- **Alternativas descartadas:** solo lugares con una puntuación por persona (más simple,
+  pero pierde el diario y las visitas repetidas); experiencias individuales por persona
+  (se prefirió compartida, acorde al "club de dos").
