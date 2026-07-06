@@ -1,7 +1,7 @@
 import { useAuth } from "@/features/auth/AuthProvider"
 import { AuthPage } from "@/features/auth/AuthPage"
 import { AppLayout } from "@/components/layout/AppLayout"
-import { HomeView } from "@/features/home/HomeView"
+import { MapView } from "@/features/map/MapView"
 
 function App() {
   const { loading, session } = useAuth()
@@ -19,8 +19,8 @@ function App() {
   }
 
   return (
-    <AppLayout>
-      <HomeView />
+    <AppLayout bleed>
+      <MapView />
     </AppLayout>
   )
 }

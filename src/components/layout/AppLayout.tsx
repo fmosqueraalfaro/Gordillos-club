@@ -2,13 +2,20 @@ import type { ReactNode } from "react"
 import { useAuth } from "@/features/auth/AuthProvider"
 import { Button } from "@/components/ui/Button"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
+import { cn } from "@/lib/utils"
 
-export function AppLayout({ children }: { children: ReactNode }) {
+export function AppLayout({
+  children,
+  bleed = false,
+}: {
+  children: ReactNode
+  bleed?: boolean
+}) {
   const { profile, user, signOut } = useAuth()
   const name = profile?.display_name ?? user?.email ?? "Vos"
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className={cn("flex flex-col", bleed ? "h-dvh" : "min-h-dvh")}>
       <header className="sticky top-0 z-10 border-b border-border bg-paper/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3">
           <a href="/" className="flex items-baseline gap-2">
@@ -29,7 +36,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">{children}</main>
+      <main className={cn(bleed ? "flex-1 overflow-hidden" : "mx-auto w-full max-w-3xl flex-1 px-4 py-6")}>
+        {children}
+      </main>
     </div>
   )
 }
