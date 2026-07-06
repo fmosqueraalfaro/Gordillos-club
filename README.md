@@ -1,32 +1,45 @@
-# React + TypeScript + Vite
+# Gordillos Club 🍽️
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Diario de restaurantes sobre un mapa, para dos. Registramos a dónde fuimos por barrio,
+puntuamos con estrellas, dejamos notas y fotos, y vemos nuestras experiencias.
 
-Currently, two official plugins are available:
+> Uso personal. El nombre de producto es **Gordillos Club**; el repo mantiene el codename
+> `Restaurant-Judge` por historia.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+- **Frontend:** React 19 + Vite + TypeScript + Tailwind CSS v4
+- **Backend:** Supabase (Postgres + PostGIS + Auth + Storage)
+- **Mapa:** Google Maps (`@vis.gl/react-google-maps`)
+- **Tipografía:** Fraunces + Hanken Grotesk
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Desarrollo
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+cp .env.example .env   # y completá los valores reales
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Variables de entorno (ver `.env.example`):
+
+- `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` — Supabase (Project Settings → API)
+- `VITE_GOOGLE_MAPS_API_KEY` — Google Maps (ver `docs/setup-google-maps.md`)
+
+## Base de datos
+
+Las migraciones SQL están en `supabase/migrations/`. Se aplican en el SQL Editor de Supabase.
+Ver `supabase/README.md`.
+
+## Documentación
+
+- `CLAUDE.md` — contexto principal del proyecto.
+- `docs/` — contexto, modelo de datos, decisiones (ADR), recomendaciones, setup, roadmap.
+- `worklog/` — bitácora de trabajo por fecha.
+
+## Scripts
+
+- `npm run dev` — servidor de desarrollo
+- `npm run build` — build de producción (typecheck + Vite)
+- `npm run preview` — previsualizar el build
+- `npm run lint` — oxlint
