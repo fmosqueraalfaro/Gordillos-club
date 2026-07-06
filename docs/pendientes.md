@@ -67,10 +67,12 @@ falta que habilites **"Places API (New)"** en Google Cloud para que ande el busc
 - [ ] **Bodegones por barrio** (idea de Caro): que la app diga qué bodegones tenemos/hay en
       cada barrio. Requiere **tags** (marcar "bodegón") + agrupar por barrio (data propia), y
       a futuro descubrir nuevos con Places por barrio. CABA = 48 barrios / 15 comunas.
-- [ ] **Mapa coloreado por barrio/comuna** (idea de Caro): en vez de (o además de) los pins
-      exactos, pintar los **polígonos de barrios/comunas** de CABA según cuántos bodegones
-      visitamos ahí (choropleth). CABA publica los GeoJSON de barrios y comunas; se overlayean
-      sobre Google Maps (`google.maps.Data`) con color por cantidad de visitas.
+- [x] **Mapa coloreado por barrio** (idea de Caro): toggle "Barrios" en el mapa → pinta los
+      48 barrios de CABA (choropleth verde agua) según cuántos lugares visitamos en cada uno,
+      con leyenda y tocar un barrio muestra su nombre + cantidad. GeoJSON oficial simplificado
+      en `public/caba-barrios.geojson` (se carga solo al activar). Conteo por punto-en-polígono
+      (lat/lng), no por texto. **Falta:** vista por **comuna** y cruzar con **tag "bodegón"**
+      (hoy cuenta todos los lugares, no solo bodegones — necesita tags).
 
 ## 🎨 Pulido y marca
 

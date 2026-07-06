@@ -5,9 +5,10 @@ import { AddExperienceSheet } from "@/features/experiences/AddExperienceSheet"
 import { RestaurantDetailSheet } from "@/features/restaurants/RestaurantDetailSheet"
 import { PlaceSearch } from "@/features/map/PlaceSearch"
 import type { PickedPlace } from "@/features/map/PlaceSearch"
+import { BarriosLayer } from "@/features/map/BarriosLayer"
 import type { DraftLocation } from "@/features/experiences/types"
 import type { Restaurant } from "@/features/restaurants/types"
-import { MapPinIcon, PlusIcon, LocateIcon } from "@/components/ui/icons"
+import { MapPinIcon, MapIcon, PlusIcon, LocateIcon } from "@/components/ui/icons"
 
 const KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const BUENOS_AIRES = { lat: -34.6037, lng: -58.3816 }
@@ -23,6 +24,7 @@ function MapInner() {
   const [draft, setDraft] = useState<DraftLocation | null>(null)
   const [prefill, setPrefill] = useState<{ name?: string; neighborhood?: string } | undefined>()
   const [selected, setSelected] = useState<Restaurant | null>(null)
+  const [showBarrios, setShowBarrios] = useState(false)
 
   function closeDraft() {
     setDraft(null)
@@ -69,8 +71,30 @@ function MapInner() {
 
         <MyLocation />
 
-        {/* Buscador de lugares (Places). Se oculta al elegir un punto en el mapa. */}
-        {!placing && !draft && !selected && <PlaceSearch onPick={pickFromSearch} />}
+        {showBarrios && <BarriosLayer restaurants={restaurants} />}
+
+        {/* Buscador de lugares (Places). Se oculta al elegir un punto o ver barrios. */}
+        {!placing && !draft && !selected && !showBarrios && (
+          <PlaceSearch onPick={pickFromSearch} />
+        )}
+
+        {/* Toggle capa de barrios (choropleth) */}
+        {!placing && !draft && !selected && (
+          <button
+            type="button"
+            onClick={() => setShowBarrios((v) => !v)}
+            aria-pressed={showBarrios}
+            className={
+              "absolute bottom-36 left-5 z-20 inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold shadow-lg backdrop-blur transition " +
+              (showBarrios
+                ? "border-aqua bg-aqua text-aqua-ink"
+                : "border-border bg-surface/95 text-ink hover:text-aqua")
+            }
+          >
+            <MapIcon className="size-4" />
+            Barrios
+          </button>
+        )}
 
         {/* Banner de "elegí el punto" */}
         {placing && (
