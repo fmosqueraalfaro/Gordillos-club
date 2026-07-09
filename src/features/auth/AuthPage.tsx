@@ -91,6 +91,9 @@ export function AuthPage() {
         <p className="mt-5 text-center text-xs text-muted">
           Club privado de dos. El registro está cerrado.
         </p>
+        <p className="mt-2 text-center text-xs text-pink-500">
+          Para Pili, te quiero mucho 💗
+        </p>
       </div>
     </main>
   )

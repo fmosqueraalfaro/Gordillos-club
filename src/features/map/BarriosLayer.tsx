@@ -4,7 +4,7 @@ import { countByBarrio } from "@/features/map/geo"
 import type { BarriosGeoJson } from "@/features/map/geo"
 
 const AQUA = "#0FB4A3" // fuimos (verde agua, más intenso = más lugares)
-const AMBER = "#F59E0B" // no fuimos (ámbar, para que resalte lo pendiente)
+const AMBER = "#EC4899" // no fuimos (rosa, para que resalte lo pendiente 💗)
 
 // Leyenda: ámbar = 0, después la rampa verde.
 const LEGEND = [
@@ -108,7 +108,7 @@ export function BarriosLayer({
       {info && (
         <p className="mb-2 text-sm font-medium text-ink">
           {info.name} ·{" "}
-          <span className={info.count > 0 ? "text-aqua" : "text-amber-500"}>
+          <span className={info.count > 0 ? "text-aqua" : "text-pink-500"}>
             {info.count} {info.count === 1 ? "lugar" : "lugares"}
           </span>
         </p>
